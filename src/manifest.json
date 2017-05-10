@@ -28,7 +28,7 @@
   }, 
   "name": "Poloniex\u2122 Ninja", 
   "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.16", 
+  "version": "0.0.18", 
   "background": {
     "scripts": [
       "js/background.js"
