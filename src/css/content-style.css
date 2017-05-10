@@ -1,0 +1,27 @@
+th.poloniex-ninja {
+  background-color: #8cbcbd !important;
+}
+
+td.poloniex-ninja {
+  background-color: #f2faff !important;
+}
+
+.poloniex-ninja-dark th.poloniex-ninja {
+  background-color: #546362 !important;
+}
+
+.poloniex-ninja-dark td.poloniex-ninja {
+  background-color: #2b3737 !important;
+}
+
+td.poloniex-ninja.neutral {
+  color: yellow !important;
+}
+
+td.poloniex-ninja.negative {
+  color: red !important;
+}
+
+td.poloniex-ninja.positive {
+  color: green !important;
+}
