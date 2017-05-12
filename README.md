@@ -8,6 +8,8 @@ The tools aim to improve decision making by reducing the time needed for hand
 calculations usually done using external tools. Please read the disclaimer below
 before using this software.
 
+Get the [**Poloniex Ninja™ Chrome extension**](http://bit.ly/polo-ninja-gh).
+
 ## Features
 
 **The tool is being developed. Balance extensions are currently supported.**
