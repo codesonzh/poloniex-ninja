@@ -12,6 +12,25 @@ before using this software.
 
 **The tool is being developed. Balance extensions are currently supported.**
 
+The added balance columns are as follows:
+
+* **AVG Buy Price** - the average weighted buy price which justifies the current
+  balance of the coin (we consider the transaction history backwards up to the
+  point where the net balance was 0) - this will match your trade history
+  analysis only if you follow the same algorithm
+* **AVG Buy Value** - the estimated buy value of the current balance (Balance *
+  AVG Buy Price)
+* **Change** - The growth comparing the current BTC Value against AVG Buy Value,
+  this indicator tells you if you're currently losing or gaining money
+* **USD Value** - Estimated value of the coin in USDT (BTC converted to USD)
+
+**Notice!**
+
+AVG Buy Price, AVG Buy Value and Change columns only consider BTC transactions
+against an altcoin other than USDT. This means that for example ETH and XMR
+exchanges for other altcoins are not taken into account (the Change column may
+be incorrect as well as the AVG columns).
+
 ![Balance columns](https://github.com/codesonzh/poloniex-ninja/blob/master/docs/balances.png?raw=true)
 
 
@@ -31,11 +50,11 @@ Thanks for supporting development of Poloniex™ Ninja!
 
 ## Privacy
 
-Poloniex™ Ninja does not collect any information about the user, prices, balances
-or other information or meta data associated while using the extension. All
-computation is done on the client, however some data may be requested using the
-fetch or XHR API exclusively from the Poloniex™ server (only GET requests) in
-order to provide more context and to be up to date.
+Poloniex™ Ninja does not collect any information about the user, prices,
+balances or other information or meta data associated while using the extension.
+All computation is done on the client, however some data may be requested using
+the fetch or XHR API exclusively from the Poloniex™ server (only GET requests)
+in order to provide more context and to be up to date.
 
 Since the source code is available and the extension is only requesting access
 to poloniex.com, no data is being collected and the program only operates in the
