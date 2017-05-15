@@ -277,7 +277,7 @@ function onProgressComplete(callback) {
       return;
     }
     var style = $("#wdProgress").attr("style");
-    if (style && style.indexOf("100%") >= 0) {
+    if (style && parseFloat(style.split(': ').pop()) >= 50) {
       callback();
       clearInterval(interval);
     }
