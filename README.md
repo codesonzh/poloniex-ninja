@@ -38,13 +38,13 @@ be incorrect as well as the AVG columns).
 
 ## Donations
 
-Consider donating 0.005 BTC or more to this address:
+Consider donating 0.006 BTC or more to this address:
 
 ```
 39u3azbyQNCCYRgo13MJ2qEUc3dPY9y7xr
 ```
 
-Please send only Bitcoin in amounts not below 0.005 BTC as special fees
+Please send only Bitcoin in amounts not below 0.006 BTC as special fees
 apply to me when the amount is less.
 
 Thanks for supporting development of Poloniex™ Ninja!
