@@ -1,5 +1,31 @@
 (function() {
 
+// Listen for storage changes.
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (key in changes) {
+    if (key == "settings") {
+     applySettings(changes[key].newValue);
+   }
+  }
+});
+
+// Updates column visibility from the settings object for visibility.
+function updateColumnVisibility(visibility) {
+  for (var column in visibility) {
+    var $el = $(".poloniex-ninja." + column);
+    if (visibility[column]) {
+      $el.removeClass("poloniex-ninja-hidden");
+    } else {
+      $el.addClass("poloniex-ninja-hidden");
+    }
+  }
+}
+
+// Applies all settings to the page.
+function applySettings(settings) {
+  updateColumnVisibility(settings['balance_column_visibility']);
+}
+
 // Asnychronous version of the each method to keep responsiveness.
 $.fn.extend({
   eachAsync: function(callback) {
@@ -129,7 +155,7 @@ function updateUsdBalance($rowQuery) {
     var usdValue =
         (bitcoinValue * state.data.btcPrice).toFixed(config.USD_DECIMALS);
 
-    $row.find(".usd-value:first").html("$ " + usdValue);
+    $row.find(".usd_value:first").html("$ " + usdValue);
   });
 }
 
@@ -161,8 +187,8 @@ function updateAvgBuyPriceAndValue($rowQuery) {
   $rowQuery.eachAsync(function() {
     var $row = $(this);
     getHistoricalSummary($row, function(r) {
-      var $avgBuyPriceCell = $row.find("td.avg-buy-price");
-      var $avgBuyValueCell = $row.find("td.avg-buy-value");
+      var $avgBuyPriceCell = $row.find("td.avg_buy_price");
+      var $avgBuyValueCell = $row.find("td.avg_buy_value");
       $avgBuyPriceCell.html(
           r.avgBuyPrice.toFixed(config.AVG_BUY_PRICE_DECIMALS));
       $avgBuyValueCell.html(
@@ -182,7 +208,7 @@ function updateChangePercent($rowQuery) {
   $rowQuery.eachAsync(function() {
     var $row = $(this);
     getHistoricalSummary($row, function(r) {
-      var $changePercentCell = $row.find("td.change-percent");
+      var $changePercentCell = $row.find("td.change_percent");
       $changePercentCell.html(formatChangePercent(r.changePercent));
       $changePercentCell
         .removeClass("neutral")
@@ -340,10 +366,14 @@ function addExtraBalanceTableColumns() {
 
   // Attach headers.
   var $lastHeader = $("#balancesTable thead:first tr th:last");
-  $("<th class='poloniex-ninja'>AVG Buy Price</th>").insertBefore($lastHeader);
-  $("<th class='poloniex-ninja'>AVG Buy Value</th>").insertBefore($lastHeader);
-  $("<th class='poloniex-ninja'>Change</th>").insertBefore($lastHeader);
-  $("<th class='poloniex-ninja'>USD Value</th>").insertBefore($lastHeader);
+  $("<th class='poloniex-ninja avg_buy_price'>AVG Buy Price</th>")
+      .insertBefore($lastHeader);
+  $("<th class='poloniex-ninja avg_buy_value'>AVG Buy Value</th>")
+      .insertBefore($lastHeader);
+  $("<th class='poloniex-ninja change_percent'>Change</th>")
+      .insertBefore($lastHeader);
+  $("<th class='poloniex-ninja usd_value'>USD Value</th>")
+      .insertBefore($lastHeader);
 
   // Add extra cells for USD as each row is inserted.
   $("#balancesTable tbody").on("DOMNodeInserted", "tr", function(x) {
@@ -353,20 +383,23 @@ function addExtraBalanceTableColumns() {
     var $row = $(x.target);
 
     // Skip row if already initialized.
-    if ($row.find(".usd-value").length > 0)
+    if ($row.find(".usd_value").length > 0)
       return;
 
     // Add placeholder cells.
     var $lc = $row.find("td:last");
-    $("<td class='poloniex-ninja avg-buy-price'>n/a</td>").insertBefore($lc);
-    $("<td class='poloniex-ninja avg-buy-value'>n/a</td>").insertBefore($lc);
-    $("<td class='poloniex-ninja change-percent'>n/a</td>").insertBefore($lc);
-    $("<td class='poloniex-ninja usd-value'>n/a</td>").insertBefore($lc);
+    $("<td class='poloniex-ninja avg_buy_price'>n/a</td>").insertBefore($lc);
+    $("<td class='poloniex-ninja avg_buy_value'>n/a</td>").insertBefore($lc);
+    $("<td class='poloniex-ninja change_percent'>n/a</td>").insertBefore($lc);
+    $("<td class='poloniex-ninja usd_value'>n/a</td>").insertBefore($lc);
   });
 
   // Once the progress bar has indicated that stuff is loaded, fill out the
   // columns and bind events.
   onProgressComplete(function() {
+    // Apply current settings.
+    getAllSettings(applySettings);
+
     computeAvgBuyPriceAsync(function() {
       var $filterable = $("#balancesTable tbody tr.filterable");
 
@@ -381,7 +414,7 @@ function addExtraBalanceTableColumns() {
 
       // Update the change column as avg buy value or btc value changes.
       onInitAndChange(
-          $filterable.find("td.value, td.avg-buy-value, td.avg-buy-price"),
+          $filterable.find("td.value, td.avg_buy_value, td.avg_buy_price"),
           function($cell) {
             updateChangePercent($cell.closest("tr"));
           });
@@ -422,6 +455,9 @@ function main() {
   if (doAdjustTheme) {
     adjustTheme();
   }
+
+  // Apply current settings.
+  getAllSettings(applySettings);
 }
 
 main();

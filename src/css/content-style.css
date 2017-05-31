@@ -25,3 +25,7 @@ td.poloniex-ninja.negative {
 td.poloniex-ninja.positive {
   color: green !important;
 }
+
+.poloniex-ninja-hidden {
+  display: none;
+}
