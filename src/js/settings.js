@@ -35,7 +35,19 @@ function getSettings(key, callback) {
 // Loads all settings and passes them to the callback.
 function getAllSettings(callback) {
   chrome.storage.sync.get('settings', function(r) {
-    callback(r.settings);
+    // Update all in-memory settings from storage.
+    try {
+      for (var i in r.settings) {
+        for (var j in r.settings[i]) {
+          SETTINGS[i][j] = r.settings[i][j];
+        }
+      }
+    } catch (ex) {
+      resetSettings();
+    }
+    if (callback) {
+      callback(SETTINGS);
+    }
   });
 }
 
@@ -45,16 +57,5 @@ function resetSettings(callback) {
   updateSettings(callback);
 }
 
-// Load the current settings.
-chrome.storage.sync.get('settings', function(r) {
-  // Update all settings.
-  try {
-    for (var i in r.settings) {
-      for (var j in r.settings[i]) {
-        SETTINGS[i][j] = r.settings[i][j];
-      }
-    }
-  } catch (ex) {
-    resetSettings();
-  }
-});
+// Load up initial settings.
+getAllSettings();

@@ -1,13 +1,11 @@
 $(function() {
-  // importing SETTINGS, getSettings, updateSettings, resetSettings
+  // importing SETTINGS, getAllSettings, updateSettings, resetSettings
   // from settings.js
 
   // Applies all settings to the UI.
   function applySettings(settings) {
-    console.info("Applying settings");
     var visibility = settings['balance_column_visibility'];
     for (var id in visibility) {
-      console.log("Applying to UI", id, visibility[id], $(".visibility#" + id));
       $(".visibility#" + id).prop("checked", visibility[id]);
     }
   }
@@ -31,7 +29,6 @@ $(function() {
 
   // Apply reset settings event.
   $("#reset_settings").click(function() {
-    console.info("Reseting settings to defaults.");
     resetSettings(applySettings);
   })
 })
