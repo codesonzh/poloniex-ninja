@@ -11,8 +11,6 @@ var DEFAULT_SETTINGS = {
 // Current settings.
 var SETTINGS = jQuery.extend(true, {}, DEFAULT_SETTINGS);
 
-var SETTINGS_READY = false;
-
 // Updates the extension settings in chrome sync storage.
 function updateSettings(callback) {
   // Get a value saved in a form.
