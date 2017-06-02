@@ -10,6 +10,16 @@ before using this software.
 
 Get the [**Poloniex Ninja™ Chrome extension**](http://bit.ly/polo-ninja-gh).
 
+## Donations
+
+Consider donating 0.002 BTC or more to this address:
+
+```
+1BjJdkoRvhtVkHGm4Fs7pZu4rmk2eYEkd6
+```
+
+Thanks for supporting development of Poloniex™ Ninja!
+
 ## Features
 
 **The tool is being developed. Balance extensions are currently supported.**
@@ -34,20 +44,6 @@ exchanges for other altcoins are not taken into account (the Change column may
 be incorrect as well as the AVG columns).
 
 ![Balance columns](https://github.com/codesonzh/poloniex-ninja/blob/master/docs/balances.png?raw=true)
-
-
-## Donations
-
-Consider donating 0.006 BTC or more to this address:
-
-```
-39u3azbyQNCCYRgo13MJ2qEUc3dPY9y7xr
-```
-
-Please send only Bitcoin in amounts not below 0.006 BTC as special fees
-apply to me when the amount is less.
-
-Thanks for supporting development of Poloniex™ Ninja!
 
 
 ## Privacy
