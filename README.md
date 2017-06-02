@@ -18,6 +18,10 @@ Consider donating 0.002 BTC or more to this address:
 1BjJdkoRvhtVkHGm4Fs7pZu4rmk2eYEkd6
 ```
 
+Donations are the only mechanism of getting something in return for investing
+my spare time developing PoloNinja. Your contribution, however small, is a
+clear message of support and acceptance.
+
 Thanks for supporting development of Poloniex™ Ninja!
 
 ## Features
@@ -54,9 +58,16 @@ All computation is done on the client, however some data may be requested using
 the fetch or XHR API exclusively from the Poloniex™ server (only GET requests)
 in order to provide more context and to be up to date.
 
-Since the source code is available and the extension is only requesting access
-to poloniex.com, no data is being collected and the program only operates in the
-browser.
+The extension is only requesting access to [www.]poloniex.com and no other
+origins, hence no data is being collected and the program only operates in the
+browser. An additional storage permission is requested to be able to persist the
+user settings for the extension (Chrome sync mechanism). This does not interfere
+with any other Chrome extension or user data as the storage model is isolated to
+the target extension only.
+
+As the extension is not collecting any analytics, your feedback is invaluable
+to the authors for guiding the tool towards new features, bug fixes and other
+improvements.
 
 
 ## Disclaimer
