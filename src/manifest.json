@@ -16,7 +16,7 @@
       "run_at": "document_end"
     }
   ], 
-  "description": "Improved crypto balance view on the Poloniex\u2122 exchange: buy price, growth rate & USD value of bitcoin, ethereum and altcoins.", 
+  "description": "Improved overview of crypto balance on Poloniex\u2122: buy price, growth rate and USD value of your bitcoin, ethereum and altcoins.", 
   "short_name": "poloninja", 
   "author": "codesonzh (@codesonzh)", 
   "manifest_version": 2, 
@@ -29,7 +29,7 @@
   }, 
   "name": "Poloniex\u2122 Ninja", 
   "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.26", 
+  "version": "0.0.28", 
   "background": {
     "scripts": [
       "js/background.js"
