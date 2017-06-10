@@ -15,7 +15,7 @@ Get the [**Poloniex Ninja™ Chrome extension**](http://bit.ly/polo-ninja-gh).
 Consider donating 0.002 BTC or more to this address:
 
 ```
-1BjJdkoRvhtVkHGm4Fs7pZu4rmk2eYEkd6
+1Q2PaaNsTE69ZhYuL5hLt9h5v7aomwvPEu
 ```
 
 Donations are the only mechanism of getting something in return for investing
