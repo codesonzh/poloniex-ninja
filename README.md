@@ -17,6 +17,8 @@ Consider donating 0.002 BTC or more to this address:
 ```
 15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ
 ```
+![15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ?amount=0.002](https://github.com/codesonzh/poloniex-ninja/blob/master/src/img/donate-qr-code.png?raw=true)
+
 
 Donations are the only mechanism of getting something in return for investing
 my spare time developing PoloNinja. Your contribution, however small, is a
