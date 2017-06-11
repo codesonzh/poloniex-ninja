@@ -268,7 +268,7 @@ function getBtcPriceEstimate() {
 
 // Get the row associated with the coin.
 function getCoinRow(coinName) {
-  return $("#balancesTable td.coin a:contains(" + coinName + ")").closest("tr");
+  return $("#balancesTable tr[data-url='" + coinName + "']");
 }
 
 // Returns the class of the change.
