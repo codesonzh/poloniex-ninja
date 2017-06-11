@@ -33,9 +33,9 @@ Thanks for supporting development of Poloniex™ Ninja!
 The added balance columns are as follows:
 
 * **AVG Buy Price** - the average weighted buy price which justifies the current
-  balance of the coin (we consider the transaction history backwards up to the
-  point where the net balance was 0) - this will match your trade history
-  analysis only if you follow the same algorithm
+  balance of the coin; we consider the transaction history backwards up to the
+  point where the net balance was 0 (including deposits and withdrawals) - this
+  will match your trade history analysis only if you follow the same algorithm.
 * **AVG Buy Value** - the estimated buy value of the current balance (Balance *
   AVG Buy Price)
 * **Change** - The growth comparing the current BTC Value against AVG Buy Value,

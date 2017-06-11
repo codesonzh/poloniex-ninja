@@ -51,8 +51,10 @@ var config = {
 // The current state.
 var state = {'data': null,
              'history': null,
+             'depositsAndWithdrawals': null,
              'avgBuyPriceOfCoin': null,
-             'lastHistoryUpdate': 0};
+             'lastHistoryUpdate': 0,
+             'lastDepositsAndWithdrawalsUpdate': 0};
 
 function getTimestamp() {
   return + new Date();
@@ -88,6 +90,35 @@ function loadTradeHistory(callback) {
     // Provide cached results.
     callback(state.history, /*cached=*/true);
   }
+}
+
+// Loads the last 1000 deposits and withdrawals.
+function loadDepositsAndWithdrawalsHistory(callback) {
+  if ((getTimestamp() - state.lastDepositsAndWithdrawalsUpdate) >
+      config.HISTORY_UPDATE_INTERVAL_MS) {
+    $.getJSON(
+      "/private?command=returnWithdrawalsDeposits&limit=1000",
+      function(depositsAndWithdrawals) {
+        state.depositsAndWithdrawals = depositsAndWithdrawals;
+        state.lastDepositsAndWithdrawalsUpdate = getTimestamp();
+        callback(depositsAndWithdrawals, /*cached=*/false);
+      });
+  } else {
+    // Provide cached results.
+    callback(state.depositsAndWithdrawals, /*cached=*/true);
+  }
+}
+
+// Loads all transactions (trade history and deposits & withdrawals).
+function loadTransactions(callback) {
+  loadTradeHistory(function(history, cached) {
+    loadDepositsAndWithdrawalsHistory(function(depositsAndWithdrawals) {
+        callback(history,
+                 depositsAndWithdrawals.deposits,
+                 depositsAndWithdrawals.withdrawals,
+                 cached);
+    });
+  });
 }
 
 // Fires a callback once at init and each time DOM is modified.
@@ -252,11 +283,19 @@ function getChangeClass(changePercent) {
 }
 
 // Computes the average buy price from the trade history.
-function computeAvgBuyPrice(transactions, currentBalance) {
+function computeAvgBuyPrice(transactions, boundaryTransactions,
+                            currentBalance) {
   var balance = currentBalance;
   var rates = [];
   var totalBuyAmount = 0.0;
   var computed = false;
+
+  // Subtract all deposits and withdrawals from current balance. This will
+  // account for the part of the current balance. Notice that withdrawals are
+  // always negative.
+  for (var i = 0; i < boundaryTransactions.length; i++) {
+    balance -= boundaryTransactions[i].amount;
+  }
 
   // Scrub through the history and determine the rates and amounts for buys.
   for (var i = 0; i < transactions.length; i++) {
@@ -310,15 +349,57 @@ function onProgressComplete(callback) {
   }, period);
 }
 
+// Computes the boundary transactions: deposits and withdrawals as the same
+// type of entry.
+function computeBoundaryTransactions(deposits, withdrawals) {
+  var boundaryTransactions = {};
+  for (var i = 0; i < deposits.length; i++) {
+    var item = deposits[i];
+    if (!(item.currency in boundaryTransactions)) {
+      boundaryTransactions[item.currency] = [];
+    }
+
+    if (item.status != "COMPLETE")
+      continue;
+
+    boundaryTransactions[item.currency].push({
+      'amount': parseFloat(item.amount),
+      'type': 'deposit',
+      'currency': item.currency
+    });
+  }
+
+  for (var i = 0; i < withdrawals.length; i++) {
+    var item = withdrawals[i];
+    if (!(item.currency in boundaryTransactions)) {
+      boundaryTransactions[item.currency] = [];
+    }
+
+    if (item.status.indexOf("COMPLETE") < 0)
+      continue;
+
+    boundaryTransactions[item.currency].push({
+      'amount': -1.0 * (parseFloat(item.amount) + parseFloat(item.fee)),
+      'type': 'withdrawal',
+      'currency': item.currency
+    });
+  }
+
+  return boundaryTransactions;
+}
+
 // Loads the historical data and saves to the state cache.
 // If a callback is provided, it will execute once the cache has been updated.
 function computeAvgBuyPriceAsync(callback) {
-  loadTradeHistory(function(history, cached) {
+  loadTransactions(function(history, deposits, withdrawals, cached) {
     // We don't need to recompute on the cached history.
     if (cached && callback) {
       callback();
       return;
     }
+
+    var boundaryTransactions =
+        computeBoundaryTransactions(deposits, withdrawals);
 
     state.avgBuyPriceOfCoin = {}
     for (var pair in history) {
@@ -341,7 +422,9 @@ function computeAvgBuyPriceAsync(callback) {
 
       // Store the results.
       state.avgBuyPriceOfCoin[targetCoin] =
-          computeAvgBuyPrice(history[pair], currentBalance);
+          computeAvgBuyPrice(history[pair],
+                             boundaryTransactions[targetCoin] || [],
+                             currentBalance);
     }
 
     if (callback) {
