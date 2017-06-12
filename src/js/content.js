@@ -1,5 +1,25 @@
 (function() {
 
+// TODO: Use config from Chrome sync storage.
+var config = {
+  'USD_DECIMALS': 2,
+  'CHANGE_PERCENT_DECIMALS': 2,
+  'AVG_BUY_PRICE_DECIMALS': 8,
+  'BALANCE_PRECISION': 1e-7,
+  'CHANGE_PRECISION': 0.01,
+  'HISTORY_UPDATE_INTERVAL_MS': 120000,
+  'STORAGE_WRITE_INTERVAL_MS': 10000,
+}
+
+// The current state.
+var state = {'data': null,
+             'history': null,
+             'depositsAndWithdrawals': null,
+             'avgBuyPriceOfCoin': null,
+             'lastStorageWrite': 0,
+             'lastHistoryUpdate': 0,
+             'lastDepositsAndWithdrawalsUpdate': 0};
+
 // Listen for storage changes.
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   for (key in changes) {
@@ -8,6 +28,35 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
    }
   }
 });
+
+// Loads the cached state from Chrome local storage.
+function loadCachedState(callback) {
+  chrome.storage.local.get('state', function(r) {
+    if (r.state) {
+      for (var k in state) {
+        if (k in r.state) {
+          state[k] = r.state[k];
+        }
+      }
+    };
+    if (callback) {
+      callback(state);
+    }
+  });
+}
+
+// Saves the cached state to Chrome local storage.
+function saveCachedState(callback) {
+  if ((getTimestamp() - state.lastStorageWrite) >
+      config.STORAGE_WRITE_INTERVAL_MS) {
+    state.lastStorageWrite = getTimestamp();
+    chrome.storage.local.set({'state': state}, function() {
+      if (callback) {
+        callback(state);
+      }
+    });
+  }
+}
 
 // Updates column visibility from the settings object for visibility.
 function updateColumnVisibility(visibility) {
@@ -37,24 +86,6 @@ $.fn.extend({
     })
   }
 });
-
-// TODO: Use config from user storage obtained from background script.
-var config = {
-  'USD_DECIMALS': 2,
-  'CHANGE_PERCENT_DECIMALS': 2,
-  'AVG_BUY_PRICE_DECIMALS': 8,
-  'BALANCE_PRECISION': 1e-7,
-  'CHANGE_PRECISION': 0.01,
-  'HISTORY_UPDATE_INTERVAL_MS': 60000
-}
-
-// The current state.
-var state = {'data': null,
-             'history': null,
-             'depositsAndWithdrawals': null,
-             'avgBuyPriceOfCoin': null,
-             'lastHistoryUpdate': 0,
-             'lastDepositsAndWithdrawalsUpdate': 0};
 
 function getTimestamp() {
   return + new Date();
@@ -458,6 +489,8 @@ function computeAvgBuyPriceAsync(callback, forceRecompute) {
     if (callback) {
       callback();
     }
+
+    saveCachedState();
   });
 }
 
@@ -560,7 +593,9 @@ function main() {
   // Match the page and apply a DOM layer.
   var doAdjustTheme = true;
   if (getPagePath().match(/balances.*/)) {
-    addExtraBalanceTableColumns();
+    loadCachedState(function() {
+      addExtraBalanceTableColumns();
+    });
   } else {
     console.info("PoloNinja: No modifications were done on this page.");
     doAdjustTheme = false;
