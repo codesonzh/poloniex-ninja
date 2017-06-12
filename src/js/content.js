@@ -73,6 +73,22 @@ function adjustTheme() {
   }
 }
 
+// Fires a callback with all results once all methods have completed.
+function onAllComplete(asyncMethodMap, callback) {
+  var results = {};
+  var callbacksRemaining = Object.keys(asyncMethodMap).length;
+  for (var name in asyncMethodMap) {
+    (function(name, asyncMethod, asyncMethodCallback) {
+      asyncMethod(function() {
+        $.extend(results, asyncMethodCallback.apply(this, arguments));
+        if (--callbacksRemaining == 0) {
+          callback(results);
+        }
+      });
+    })(name, asyncMethodMap[name][0], asyncMethodMap[name][1]);
+  }
+}
+
 // Loads the entire trade history for average buy value and change estimate.
 // The results may be cached. A callback is executed with the results and
 // a boolean argument determining whether the results are cached.
@@ -111,14 +127,25 @@ function loadDepositsAndWithdrawalsHistory(callback) {
 
 // Loads all transactions (trade history and deposits & withdrawals).
 function loadTransactions(callback) {
-  loadTradeHistory(function(history, cached) {
-    loadDepositsAndWithdrawalsHistory(function(depositsAndWithdrawals) {
-        callback(history,
-                 depositsAndWithdrawals.deposits,
-                 depositsAndWithdrawals.withdrawals,
-                 cached);
-    });
-  });
+  onAllComplete({
+      'loadTradeHistory': [
+          loadTradeHistory,
+          function(history, cached) {
+            return {'history': history, 'historyCached': cached};
+          }],
+      'loadDepositsAndWithdrawalsHistory': [
+          loadDepositsAndWithdrawalsHistory,
+          function(depositsAndWithdrawals, cached) {
+            return {'depositsAndWithdrawals': depositsAndWithdrawals,
+                    'depositsAndWithdrawalsCached': cached};
+          }]
+      },
+      function(results) {
+        callback(results.history,
+                 results.depositsAndWithdrawals.deposits,
+                 results.depositsAndWithdrawals.withdrawals,
+                 results.historyCached && results.depositsAndWithdrawalsCached);
+      });
 }
 
 // Fires a callback once at init and each time DOM is modified.
@@ -390,10 +417,11 @@ function computeBoundaryTransactions(deposits, withdrawals) {
 
 // Loads the historical data and saves to the state cache.
 // If a callback is provided, it will execute once the cache has been updated.
-function computeAvgBuyPriceAsync(callback) {
+function computeAvgBuyPriceAsync(callback, forceRecompute) {
   loadTransactions(function(history, deposits, withdrawals, cached) {
-    // We don't need to recompute on the cached history.
-    if (cached && callback) {
+    // We don't need to recompute on the cached history unless this is indicated
+    // to be the first call via forceRecompute.
+    if (!forceRecompute && cached && callback) {
       callback();
       return;
     }
@@ -477,51 +505,54 @@ function addExtraBalanceTableColumns() {
     $("<td class='poloniex-ninja usd_value'>n/a</td>").insertBefore($lc);
   });
 
-  // Once the progress bar has indicated that stuff is loaded, fill out the
-  // columns and bind events.
-  onProgressComplete(function() {
-    // Apply current settings.
-    getAllSettings(applySettings);
+  // Once the progress bar has indicated that stuff is loaded and we got the
+  // transaction history cached, fill out the columns and bind events.
+  onAllComplete(
+      {'onProgressComplete': [onProgressComplete, function() { return {}; }],
+       'loadTransactions': [loadTransactions, function() { return {}; }]},
+      function() {
+        // Apply current settings.
+        getAllSettings(applySettings);
 
-    computeAvgBuyPriceAsync(function() {
-      var $filterable = $("#balancesTable tbody tr.filterable");
+        computeAvgBuyPriceAsync(function() {
+          var $filterable = $("#balancesTable tbody tr.filterable");
 
-      // Update avg buy price and value as total balance changes.
-      onInitAndChange(
-          $filterable.find("td.balance"),
-          function($cell) {
-            computeAvgBuyPriceAsync(function() {
-              updateAvgBuyPriceAndValue($cell.closest("tr"));
-            });
-          });
+          // Update avg buy price and value as total balance changes.
+          onInitAndChange(
+              $filterable.find("td.balance"),
+              function($cell) {
+                computeAvgBuyPriceAsync(function() {
+                  updateAvgBuyPriceAndValue($cell.closest("tr"));
+                });
+              });
 
-      // Update the change column as avg buy value or btc value changes.
-      onInitAndChange(
-          $filterable.find("td.value, td.avg_buy_value, td.avg_buy_price"),
-          function($cell) {
-            updateChangePercent($cell.closest("tr"));
-          });
+          // Update the change column as avg buy value or btc value changes.
+          onInitAndChange(
+              $filterable.find("td.value, td.avg_buy_value, td.avg_buy_price"),
+              function($cell) {
+                updateChangePercent($cell.closest("tr"));
+              });
 
-      // Update USD prices as bitcoin value changes.
-      onInitAndChange(
-          $filterable.find("td.value"),
-          function($cell) {
-            updateUsdBalance($cell.closest("tr"));
-          });
+          // Update USD prices as bitcoin value changes.
+          onInitAndChange(
+              $filterable.find("td.value"),
+              function($cell) {
+                updateUsdBalance($cell.closest("tr"));
+              });
 
-      // Update all extra columns as the price changes.
-      onInitAndChange(
-          "#accountValue_btc",
-          function() {
-            state.data.btcPrice = getBtcPriceEstimate();
-            updateUsdBalance($("#balancesTable tbody tr.filterable"));
-            computeAvgBuyPriceAsync(function() {
-              updateAvgBuyPriceAndValue(
-                  $("#balancesTable tbody tr.filterable"));
-            });
-          });
-    });  // computeAvgBuyPriceAsync
-  });  // onProgressComplete
+          // Update all extra columns as the price changes.
+          onInitAndChange(
+              "#accountValue_btc",
+              function() {
+                state.data.btcPrice = getBtcPriceEstimate();
+                updateUsdBalance($("#balancesTable tbody tr.filterable"));
+                computeAvgBuyPriceAsync(function() {
+                  updateAvgBuyPriceAndValue(
+                      $("#balancesTable tbody tr.filterable"));
+                });
+              });
+        }, /*forceRecompute=*/true);  // computeAvgBuyPriceAsync
+      });  // onAllComplete.
 }
 
 // Program entry point.
