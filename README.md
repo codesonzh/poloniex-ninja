@@ -36,11 +36,17 @@ The added balance columns are as follows:
   balance of the coin; we consider the transaction history backwards up to the
   point where the net balance was 0 (including deposits and withdrawals) - this
   will match your trade history analysis only if you follow the same algorithm.
-* **AVG Buy Value** - the estimated buy value of the current balance (Balance *
+* **EST Buy Value** - the estimated buy value of the current balance (Balance *
   AVG Buy Price)
 * **Change** - The growth comparing the current BTC Value against AVG Buy Value,
   this indicator tells you if you're currently losing or gaining money
 * **USD Value** - Estimated value of the coin in USDT (BTC converted to USD)
+* **Earnings** - Total earnings at last sale in BTC. Given the coin trade
+  history (against BTC only), we compute the earnings and exclude the last
+  consecutive purchases you made. The fees are also deducted so it's net profit
+  or loss without the last purchases.
+* **Earnings USD** - Same as above, converted according to current USD/BTC
+  ratio.
 
 **Notice!**
 

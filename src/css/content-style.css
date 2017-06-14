@@ -29,3 +29,27 @@ td.poloniex-ninja.positive {
 .poloniex-ninja-hidden {
   display: none;
 }
+
+.poloniex-ninja-stretch-0 {
+}
+
+.poloniex-ninja-stretch-1 {
+}
+
+.poloniex-ninja-stretch-2 {
+}
+
+.poloniex-ninja-stretch-3 {
+}
+
+.poloniex-ninja-stretch-4 {
+  max-width: 920px !important;
+}
+
+.poloniex-ninja-stretch-5 {
+  max-width: 960px !important;
+}
+
+.poloniex-ninja-stretch-6 {
+  max-width: 1050px !important;
+}

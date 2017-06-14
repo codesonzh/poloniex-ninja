@@ -4,7 +4,7 @@
 var config = {
   'USD_DECIMALS': 2,
   'CHANGE_PERCENT_DECIMALS': 2,
-  'AVG_BUY_PRICE_DECIMALS': 8,
+  'COIN_DECIMALS': 8,
   'BALANCE_PRECISION': 1e-7,
   'CHANGE_PRECISION': 0.01,
   'HISTORY_UPDATE_INTERVAL_MS': 120000,
@@ -16,6 +16,7 @@ var state = {'data': null,
              'history': null,
              'depositsAndWithdrawals': null,
              'avgBuyPriceOfCoin': null,
+             'earningsBtcOfCoin': null,
              'lastStorageWrite': 0,
              'lastHistoryUpdate': 0,
              'lastDepositsAndWithdrawalsUpdate': 0};
@@ -60,14 +61,26 @@ function saveCachedState(callback) {
 
 // Updates column visibility from the settings object for visibility.
 function updateColumnVisibility(visibility) {
+  var visibleColumnCount = 0;
   for (var column in visibility) {
     var $el = $(".poloniex-ninja." + column);
+    if ($el.length == 0)
+      continue;
+
     if (visibility[column]) {
       $el.removeClass("poloniex-ninja-hidden");
+      visibleColumnCount++;
     } else {
       $el.addClass("poloniex-ninja-hidden");
     }
   }
+
+  // Stretch the table according to number of visible extra columns.
+  $("#content > .main")
+      .attr('class', function(i, c) {
+        return c.replace(/(^|\s)poloniex-ninja-stretch-\w+/g, '');
+      })
+      .addClass("poloniex-ninja-stretch-" + visibleColumnCount);
 }
 
 // Applies all settings to the page.
@@ -248,9 +261,9 @@ function updateUsdBalance($rowQuery) {
   });
 }
 
-// Fetches the cached historical avgBuyPrice for a given row and calls the
+// Fetches the cached historical trade data for a given row and calls the
 // callback when data is available.
-function getHistoricalSummary($row, callback) {
+function getTradeSummaryForRow($row, callback) {
   var coin = $row.find("td.coin").text();
   if (coin == null || state.avgBuyPriceOfCoin == null ||
       !(coin in state.avgBuyPriceOfCoin)) {
@@ -263,52 +276,70 @@ function getHistoricalSummary($row, callback) {
   var avgBuyPrice = state.avgBuyPriceOfCoin[coin];
   var avgBuyValue = avgBuyPrice * currentBalance;
   var changePercent = (btcValue - avgBuyValue) * 100 / avgBuyValue;
+  var earningsSlsBtc = state.earningsBtcOfCoin[coin];
+  var earningsSlsUsd = earningsSlsBtc * getBtcPriceEstimate();
 
   callback({
     'avgBuyPrice': avgBuyPrice,
     'avgBuyValue': avgBuyValue,
-    'changePercent': changePercent
+    'changePercent': changePercent,
+    'earningsSlsBtc': earningsSlsBtc,
+    'earningsSlsUsd': earningsSlsUsd,
   });
 }
 
-// Updates the average buy price and value in one or more rows.
-function updateAvgBuyPriceAndValue($rowQuery) {
+// Updates the average buy price, value and other trade related columns
+// in one or more rows.
+function updateTradeColumns($rowQuery) {
   $rowQuery.eachAsync(function() {
     var $row = $(this);
-    getHistoricalSummary($row, function(r) {
+    getTradeSummaryForRow($row, function(r) {
       var $avgBuyPriceCell = $row.find("td.avg_buy_price");
       var $avgBuyValueCell = $row.find("td.avg_buy_value");
+      var $earningsSlsBtcCell = $row.find("td.earnings_sls_btc");
+      var $earningsSlsUsdCell = $row.find("td.earnings_sls_usd");
       $avgBuyPriceCell.html(
-          r.avgBuyPrice.toFixed(config.AVG_BUY_PRICE_DECIMALS));
+          r.avgBuyPrice.toFixed(config.COIN_DECIMALS));
       $avgBuyValueCell.html(
-          r.avgBuyValue.toFixed(config.AVG_BUY_PRICE_DECIMALS));
+          r.avgBuyValue.toFixed(config.COIN_DECIMALS));
+      $earningsSlsBtcCell.html(
+          formatAsChange(r.earningsSlsBtc, config.COIN_DECIMALS));
+      applyChangeClass($earningsSlsBtcCell, r.earningsSlsBtc);
+      $earningsSlsUsdCell.html(
+          '$ ' + formatAsChange(r.earningsSlsUsd, config.USD_DECIMALS));
+      applyChangeClass($earningsSlsUsdCell, r.earningsSlsUsd);
     });
   });
 }
 
-// Formats the change percentage.
-function formatChangePercent(changePercent) {
-  return (changePercent > 0 ? "+": "") +
-         changePercent.toFixed(config.CHANGE_PERCENT_DECIMALS);
+// Formats a value displayed as change with fixed number of decimals and sign.
+function formatAsChange(value, decimals) {
+  return (value > 0 ? "+" : "") + value.toFixed(decimals);
+}
+
+// Applies the colorized css class to a cell based on it's value.
+function applyChangeClass($cell, value) {
+  $cell
+    .removeClass("neutral")
+    .removeClass("positive")
+    .removeClass("negative")
+    .addClass(getChangeClass(value));
 }
 
 // Updates the change column in one or more rows.
 function updateChangePercent($rowQuery) {
   $rowQuery.eachAsync(function() {
     var $row = $(this);
-    getHistoricalSummary($row, function(r) {
+    getTradeSummaryForRow($row, function(r) {
       var $changePercentCell = $row.find("td.change_percent");
-      $changePercentCell.html(formatChangePercent(r.changePercent));
-      $changePercentCell
-        .removeClass("neutral")
-        .removeClass("positive")
-        .removeClass("negative")
-        .addClass(getChangeClass(r.changePercent));
+      $changePercentCell.html(formatAsChange(r.changePercent,
+                                             config.CHANGE_PERCENT_DECIMALS));
+      applyChangeClass($changePercentCell, r.changePercent);
     });
   });
 }
 
-// Gets the estimated value or 0 if not available.
+// Gets the estimated value of BTC in USD or 0 if not available.
 function getBtcPriceEstimate() {
  var usdHoldings = getUsdHoldings();
  if (usdHoldings == null)
@@ -389,6 +420,23 @@ function computeAvgBuyPrice(transactions, boundaryTransactions,
   return avgBuyPrice;
 }
 
+// Computes the BTC earnings for given coin until last bought.
+function computeEarningsBtc(transactions) {
+  var earningsBtc = 0.0;
+  var saleFound = false;
+  for (var i = 0; i < transactions.length; i++) {
+    var t = transactions[i];
+    if (t.type == "buy" && saleFound) {
+      earningsBtc -= parseFloat(t.total);
+    } else if (t.type == "sell") {
+      earningsBtc += parseFloat(t.total) * (1.0 - parseFloat(t.fee));
+      saleFound = true;
+    }
+  }
+
+  return earningsBtc;
+}
+
 // Fires the callback once the progress bar has loaded.
 function onProgressComplete(callback) {
   var remainingTime = 30000;
@@ -448,7 +496,7 @@ function computeBoundaryTransactions(deposits, withdrawals) {
 
 // Loads the historical data and saves to the state cache.
 // If a callback is provided, it will execute once the cache has been updated.
-function computeAvgBuyPriceAsync(callback, forceRecompute) {
+function computeColumnsFromTradesAsync(callback, forceRecompute) {
   loadTransactions(function(history, deposits, withdrawals, cached) {
     // We don't need to recompute on the cached history unless this is indicated
     // to be the first call via forceRecompute.
@@ -461,6 +509,7 @@ function computeAvgBuyPriceAsync(callback, forceRecompute) {
         computeBoundaryTransactions(deposits, withdrawals);
 
     state.avgBuyPriceOfCoin = {}
+    state.earningsBtcOfCoin = {}
     for (var pair in history) {
       var parts = pair.split("_");
       var baseCoin = parts[0];
@@ -484,6 +533,7 @@ function computeAvgBuyPriceAsync(callback, forceRecompute) {
           computeAvgBuyPrice(history[pair],
                              boundaryTransactions[targetCoin] || [],
                              currentBalance);
+      state.earningsBtcOfCoin[targetCoin] = computeEarningsBtc(history[pair]);
     }
 
     if (callback) {
@@ -508,16 +558,52 @@ function addExtraBalanceTableColumns() {
     }
   });
 
+  // All the column descriptors.
+  var COLUMNS = [
+    {'key': 'avg_buy_price',
+     'title': 'AVG Buy Price',
+     'description': 'Average buy price of the coin based on your trades',
+     'default_visibility': true},
+    {'key': 'avg_buy_value',
+     'title': 'EST Buy Value',
+     'description': 'Estimated coin value at the average buy price',
+     'default_visibility': true},
+    {'key': 'change_percent',
+     'title': 'Change',
+     'description': 'Growth rate (change since bought)',
+     'default_visibility': true},
+    {'key': 'usd_value',
+     'title': 'USD Value',
+     'description': 'Estimated USD value of your coin holdings',
+     'default_visibility': true},
+    {'key': 'earnings_sls_btc',
+     'title': 'Earnings *',
+     'description': 'Total estimated earnings in BTC (last purchases excluded)',
+     'default_visibility': true},
+    {'key': 'earnings_sls_usd',
+     'title': 'USD Earn. *',
+     'description': 'Total estimated earnings in USD (last purchases excluded)',
+     'default_visibility': true},
+  ];
+
   // Attach headers.
   var $lastHeader = $("#balancesTable thead:first tr th:last");
-  $("<th class='poloniex-ninja avg_buy_price'>AVG Buy Price</th>")
-      .insertBefore($lastHeader);
-  $("<th class='poloniex-ninja avg_buy_value'>AVG Buy Value</th>")
-      .insertBefore($lastHeader);
-  $("<th class='poloniex-ninja change_percent'>Change</th>")
-      .insertBefore($lastHeader);
-  $("<th class='poloniex-ninja usd_value'>USD Value</th>")
-      .insertBefore($lastHeader);
+  for (var i = 0; i < COLUMNS.length; i++) {
+    var col = COLUMNS[i];
+    var header = col.title;
+    var $th =
+        $("<th class='poloniex-ninja " + col.key + "'>" + col.title + "</th>");
+    if ('description' in col) {
+      $th.attr("data-tooltip", col.description);
+    }
+    $th.insertBefore($lastHeader);
+  }
+
+  // Apply tooltips to headers.
+  $('th.poloniex-ninja[data-tooltip!=""]').qtip({
+      content: { attr: 'data-tooltip' },
+      style: { classes: 'qtip-dark qtip-rounded qtip-shadow poloTooltips' }
+  });
 
   // Add extra cells for USD as each row is inserted.
   $("#balancesTable tbody").on("DOMNodeInserted", "tr", function(x) {
@@ -527,15 +613,16 @@ function addExtraBalanceTableColumns() {
     var $row = $(x.target);
 
     // Skip row if already initialized.
-    if ($row.find(".usd_value").length > 0)
+    if ($row.find(".poloniex-ninja").length > 0)
       return;
 
     // Add placeholder cells.
-    var $lc = $row.find("td:last");
-    $("<td class='poloniex-ninja avg_buy_price'>n/a</td>").insertBefore($lc);
-    $("<td class='poloniex-ninja avg_buy_value'>n/a</td>").insertBefore($lc);
-    $("<td class='poloniex-ninja change_percent'>n/a</td>").insertBefore($lc);
-    $("<td class='poloniex-ninja usd_value'>n/a</td>").insertBefore($lc);
+    var $lastColumn = $row.find("td:last");
+    for (var i = 0; i < COLUMNS.length; i++) {
+      var col = COLUMNS[i];
+      $("<td class='poloniex-ninja " + col.key + "'>n/a</td>")
+          .insertBefore($lastColumn);
+    }
   });
 
   // Once the progress bar has indicated that stuff is loaded and we got the
@@ -547,15 +634,15 @@ function addExtraBalanceTableColumns() {
         // Apply current settings.
         getAllSettings(applySettings);
 
-        computeAvgBuyPriceAsync(function() {
+        computeColumnsFromTradesAsync(function() {
           var $filterable = $("#balancesTable tbody tr.filterable");
 
-          // Update avg buy price and value as total balance changes.
+          // Update avg buy price, value and earnings as total balance changes.
           onInitAndChange(
               $filterable.find("td.balance"),
               function($cell) {
-                computeAvgBuyPriceAsync(function() {
-                  updateAvgBuyPriceAndValue($cell.closest("tr"));
+                computeColumnsFromTradesAsync(function() {
+                  updateTradeColumns($cell.closest("tr"));
                 });
               });
 
@@ -579,12 +666,12 @@ function addExtraBalanceTableColumns() {
               function() {
                 state.data.btcPrice = getBtcPriceEstimate();
                 updateUsdBalance($("#balancesTable tbody tr.filterable"));
-                computeAvgBuyPriceAsync(function() {
-                  updateAvgBuyPriceAndValue(
+                computeColumnsFromTradesAsync(function() {
+                  updateTradeColumns(
                       $("#balancesTable tbody tr.filterable"));
                 });
               });
-        }, /*forceRecompute=*/true);  // computeAvgBuyPriceAsync
+        }, /*forceRecompute=*/true);  // computeColumnsFromTradesAsync
       });  // onAllComplete.
 }
 

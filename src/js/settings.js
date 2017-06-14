@@ -5,6 +5,8 @@ var DEFAULT_SETTINGS = {
     "avg_buy_value": true,
     "change_percent": true,
     "usd_value": true,
+    "earnings_sls_btc": true,
+    "earnings_sls_usd": true,
   }
 }
 
