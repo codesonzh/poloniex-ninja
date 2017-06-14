@@ -420,7 +420,9 @@ function computeAvgBuyPrice(transactions, boundaryTransactions,
   return avgBuyPrice;
 }
 
-// Computes the BTC earnings for given coin until last bought.
+// Computes the BTC earnings for given coin up until and including the most
+// recent sale. This only considers regular exchange trades (buy/sell). If last
+// trades were purchases, those are excluded.
 function computeEarningsBtc(transactions) {
   var earningsBtc = 0.0;
   var saleFound = false;
@@ -432,6 +434,7 @@ function computeEarningsBtc(transactions) {
       earningsBtc += parseFloat(t.total) * (1.0 - parseFloat(t.fee));
       saleFound = true;
     }
+    // FIXME: At some point loans should also be considered.
   }
 
   return earningsBtc;
