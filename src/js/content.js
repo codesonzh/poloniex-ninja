@@ -1,34 +1,134 @@
 (function() {
 
-// TODO: Use config from Chrome sync storage.
+// TODO: Consider using config from Chrome sync storage.
 var config = {
+  // Number of rounding decimals for USD value display.
   'USD_DECIMALS': 2,
+  // Number of rounding decimals for percentage display.
   'CHANGE_PERCENT_DECIMALS': 2,
+  // Number of rounding decimals for crypto currency display.
   'COIN_DECIMALS': 8,
+  // Precision for values: everything below is considered 0.
   'BALANCE_PRECISION': 1e-7,
-  'CHANGE_PRECISION': 0.01,
+  // Period for XHR requests to sync with latest history.
   'HISTORY_UPDATE_INTERVAL_MS': 120000,
+  // Minimum period for writing to Chrome storage.
   'STORAGE_WRITE_INTERVAL_MS': 10000,
+  // Maximum time to wait for the progress bar to start filling up.
+  'PROGRESS_MAX_WAIT_MS': 60000,
+  // Period for checking the progress bar status.
+  'PROGRESS_CHECK_PERIOD_MS': 10
 }
 
 // The current state.
-var state = {'data': null,
-             'history': null,
-             'depositsAndWithdrawals': null,
-             'avgBuyPriceOfCoin': null,
-             'earningsBtcOfCoin': null,
-             'lastStorageWrite': 0,
-             'lastHistoryUpdate': 0,
-             'lastDepositsAndWithdrawalsUpdate': 0};
+var state = {
+ 'data': null,
+ 'history': null,
+ 'depositsAndWithdrawals': null,
+ 'avgBuyPriceOfCoin': null,
+ 'earningsBtcOfCoin': null,
+ 'lastStorageWrite': 0,
+ 'lastHistoryUpdate': 0,
+ 'lastDepositsAndWithdrawalsUpdate': 0
+};
 
-// Listen for storage changes.
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-  for (key in changes) {
-    if (key == "settings") {
-     applySettings(changes[key].newValue);
-   }
+// Asnychronous version of the each method to keep responsiveness.
+$.fn.extend({
+  eachAsync: function(callback) {
+    $(this).each(function() {
+      var $element = $(this);
+      setTimeout(function() {
+        callback.call($element);
+      }, 10);
+    })
   }
 });
+
+// Returns the current timestamp as integer.
+function getTimestamp() {
+  return + new Date();
+}
+
+// Returns the path portion of the current page without the leading slash.
+function getPagePath() {
+  var urlParts = window.location.href.split("/");
+  return urlParts.splice(3).join("/");
+}
+
+// Fires a callback with all results once all methods have completed.
+function onAllComplete(asyncMethodMap, callback) {
+  var results = {};
+  var callbacksRemaining = Object.keys(asyncMethodMap).length;
+  for (var name in asyncMethodMap) {
+    (function(name, asyncMethod, asyncMethodCallback) {
+      asyncMethod(function() {
+        $.extend(results, asyncMethodCallback.apply(this, arguments));
+        if (--callbacksRemaining == 0) {
+          callback(results);
+        }
+      });
+    })(name, asyncMethodMap[name][0], asyncMethodMap[name][1]);
+  }
+}
+
+// Fires a callback once at init and each time DOM is modified.
+function onInitAndChange(query, callback) {
+  $(query).eachAsync(function() {
+    var $element = $(this);
+    $element.bind("DOMSubtreeModified", function(e) {
+      callback($element);
+    });
+    callback($element);
+  });
+}
+
+// Returns a numeric value from inner HTML or null if not available.
+function getFloatValueFromDom(query) {
+  if ($(query).length == 0)
+    return null;
+
+  var value = parseFloat($(query).text());
+  if (value != NaN && value != Infinity) {
+    return value;
+  }
+
+  return null;
+}
+
+// Formats a value displayed as change with fixed number of decimals and sign.
+function formatAsChange(value, decimals) {
+  return (value > 0 ? "+" : "") + value.toFixed(decimals);
+}
+
+// Returns the class of the change.
+function getChangeClass(value) {
+  if (Math.abs(value) < config.BALANCE_PRECISION) {
+    return "neutral";
+  } else if (value < 0) {
+    return "negative";
+  } else {
+    return "positive";
+  }
+}
+
+// Applies the colorized css class to a cell based on it's value.
+function applyChangeClass($cell, value) {
+  $cell
+      .removeClass("neutral")
+      .removeClass("positive")
+      .removeClass("negative")
+      .addClass(getChangeClass(value));
+}
+
+// Computes the growth rate in percentages comparing an old and new value.
+function computeGrowthRate(oldValue, newValue) {
+  return (newValue - oldValue) * 100.0 / oldValue;
+}
+
+// Applies all settings to the page.
+function applySettings(settings) {
+  updateColumnVisibility(settings['balance_column_visibility']);
+}
 
 // Loads the cached state from Chrome local storage.
 function loadCachedState(callback) {
@@ -59,7 +159,15 @@ function saveCachedState(callback) {
   }
 }
 
-// Updates column visibility from the settings object for visibility.
+// Adjusts the theme (dark/light) context.
+function adjustTheme() {
+  if ($("link[href*='dark']").length > 0) {
+    $("body").addClass("poloniex-ninja-dark");
+  }
+}
+
+// Updates column visibility from the settings object and adjusts the table
+// width according to number of visible columns.
 function updateColumnVisibility(visibility) {
   var visibleColumnCount = 0;
   for (var column in visibility) {
@@ -83,54 +191,22 @@ function updateColumnVisibility(visibility) {
       .addClass("poloniex-ninja-stretch-" + visibleColumnCount);
 }
 
-// Applies all settings to the page.
-function applySettings(settings) {
-  updateColumnVisibility(settings['balance_column_visibility']);
-}
-
-// Asnychronous version of the each method to keep responsiveness.
-$.fn.extend({
-  eachAsync: function(callback) {
-    $(this).each(function() {
-      var $element = $(this);
-      setTimeout(function() {
-        callback.call($element);
-      }, 10);
-    })
-  }
-});
-
-function getTimestamp() {
-  return + new Date();
-}
-
-// Returns the path portion of the current page without the leading slash.
-function getPagePath() {
-  var urlParts = window.location.href.split("/");
-  return urlParts.splice(3).join("/");
-}
-
-// Adjusts the theme (dark/light) context.
-function adjustTheme() {
-  if ($("link[href*='dark']").length > 0) {
-    $("body").addClass("poloniex-ninja-dark");
-  }
-}
-
-// Fires a callback with all results once all methods have completed.
-function onAllComplete(asyncMethodMap, callback) {
-  var results = {};
-  var callbacksRemaining = Object.keys(asyncMethodMap).length;
-  for (var name in asyncMethodMap) {
-    (function(name, asyncMethod, asyncMethodCallback) {
-      asyncMethod(function() {
-        $.extend(results, asyncMethodCallback.apply(this, arguments));
-        if (--callbacksRemaining == 0) {
-          callback(results);
-        }
-      });
-    })(name, asyncMethodMap[name][0], asyncMethodMap[name][1]);
-  }
+// Fires the callback once the progress bar has loaded.
+function onProgressComplete(callback) {
+  var remainingTime = config.PROGRESS_MAX_WAIT_MS;
+  var period = config.PROGRESS_CHECK_PERIOD_MS;
+  var interval = setInterval(function() {
+    remainingTime -= period;
+    if (remainingTime <= 0) {
+      clearInterval(interval);
+      return;
+    }
+    var style = $("#wdProgress").attr("style");
+    if (style && parseFloat(style.split(': ').pop()) >= 50) {
+      callback();
+      clearInterval(interval);
+    }
+  }, period);
 }
 
 // Loads the entire trade history for average buy value and change estimate.
@@ -192,17 +268,6 @@ function loadTransactions(callback) {
       });
 }
 
-// Fires a callback once at init and each time DOM is modified.
-function onInitAndChange(query, callback) {
-  $(query).eachAsync(function() {
-    var $element = $(this);
-    $element.bind("DOMSubtreeModified", function(e) {
-      callback($element);
-    });
-    callback($element);
-  });
-}
-
 // Finds the cell in the provided row matching the given header text.
 function getCellForHeader($rowElement, headerText) {
   var $matchingHeader =
@@ -211,19 +276,6 @@ function getCellForHeader($rowElement, headerText) {
     return null;
   var index = $matchingHeader.closest("th").prevAll().length;
   return $($rowElement).find("td:eq(" + index + ")");
-}
-
-// Returns a numeric value from inner HTML or null if not available.
-function getFloatValueFromDom(query) {
-  if ($(query).length == 0)
-    return null;
-
-  var value = parseFloat($(query).text());
-  if (value != NaN && value != Infinity) {
-    return value;
-  }
-
-  return null;
 }
 
 // Gets the total estimate of holdings in USD or null if not available.
@@ -242,6 +294,52 @@ function getBitcoinValue($row) {
   return getFloatValueFromDom($bitcoinValueCell);
 }
 
+// Gets the estimated value of BTC in USD or 0 if not available.
+function getBtcPriceEstimate() {
+ var usdHoldings = getUsdHoldings();
+ if (usdHoldings == null)
+   return 0.0;
+
+ var btcHoldings = getBtcHoldings();
+ if (btcHoldings == null || btcHoldings == 0.0)
+   return 0.0;
+
+  return usdHoldings / btcHoldings;
+}
+
+// Get the row associated with the coin.
+function getCoinRow(coinName) {
+  return $("#balancesTable tr[data-url='" + coinName + "']");
+}
+
+// Fetches the cached historical trade data for a given row and calls the
+// callback if data is available.
+function getTradeSummaryForRow($row, callback) {
+  var coin = $row.find("td.coin").text();
+  if (coin == null || state.avgBuyPriceOfCoin == null ||
+      !(coin in state.avgBuyPriceOfCoin)) {
+    return;
+  }
+
+  var currentBalance = getFloatValueFromDom($row.find("td.balance"));
+  var btcValue = getFloatValueFromDom($row.find("td.value"));
+  var usdValue = getBtcPriceEstimate();
+
+  var avgBuyPrice = state.avgBuyPriceOfCoin[coin];
+  var avgBuyValue = avgBuyPrice * currentBalance;
+  var changePercent = computeGrowthRate(avgBuyValue, btcValue);
+  var earningsSlsBtc = state.earningsBtcOfCoin[coin];
+  var earningsSlsUsd = earningsSlsBtc * usdValue;
+
+  callback({
+    'avgBuyPrice': avgBuyPrice,
+    'avgBuyValue': avgBuyValue,
+    'changePercent': changePercent,
+    'earningsSlsBtc': earningsSlsBtc,
+    'earningsSlsUsd': earningsSlsUsd,
+  });
+}
+
 // Updates USD balance on each row.
 function updateUsdBalance($rowQuery) {
   $rowQuery.eachAsync(function() {
@@ -258,33 +356,6 @@ function updateUsdBalance($rowQuery) {
         (bitcoinValue * state.data.btcPrice).toFixed(config.USD_DECIMALS);
 
     $row.find(".usd_value:first").html("$ " + usdValue);
-  });
-}
-
-// Fetches the cached historical trade data for a given row and calls the
-// callback when data is available.
-function getTradeSummaryForRow($row, callback) {
-  var coin = $row.find("td.coin").text();
-  if (coin == null || state.avgBuyPriceOfCoin == null ||
-      !(coin in state.avgBuyPriceOfCoin)) {
-    return;
-  }
-
-  var currentBalance = getFloatValueFromDom($row.find("td.balance"));
-  var btcValue = getFloatValueFromDom($row.find("td.value"));
-
-  var avgBuyPrice = state.avgBuyPriceOfCoin[coin];
-  var avgBuyValue = avgBuyPrice * currentBalance;
-  var changePercent = (btcValue - avgBuyValue) * 100 / avgBuyValue;
-  var earningsSlsBtc = state.earningsBtcOfCoin[coin];
-  var earningsSlsUsd = earningsSlsBtc * getBtcPriceEstimate();
-
-  callback({
-    'avgBuyPrice': avgBuyPrice,
-    'avgBuyValue': avgBuyValue,
-    'changePercent': changePercent,
-    'earningsSlsBtc': earningsSlsBtc,
-    'earningsSlsUsd': earningsSlsUsd,
   });
 }
 
@@ -312,20 +383,6 @@ function updateTradeColumns($rowQuery) {
   });
 }
 
-// Formats a value displayed as change with fixed number of decimals and sign.
-function formatAsChange(value, decimals) {
-  return (value > 0 ? "+" : "") + value.toFixed(decimals);
-}
-
-// Applies the colorized css class to a cell based on it's value.
-function applyChangeClass($cell, value) {
-  $cell
-    .removeClass("neutral")
-    .removeClass("positive")
-    .removeClass("negative")
-    .addClass(getChangeClass(value));
-}
-
 // Updates the change column in one or more rows.
 function updateChangePercent($rowQuery) {
   $rowQuery.eachAsync(function() {
@@ -337,38 +394,6 @@ function updateChangePercent($rowQuery) {
       applyChangeClass($changePercentCell, r.changePercent);
     });
   });
-}
-
-// Gets the estimated value of BTC in USD or 0 if not available.
-function getBtcPriceEstimate() {
- var usdHoldings = getUsdHoldings();
- if (usdHoldings == null)
-   return 0.0;
-
- var btcHoldings = getBtcHoldings();
- if (btcHoldings == null)
-   return 0.0;
-
- if (btcHoldings == 0.0)
-  return 0.0;
-
-  return usdHoldings / btcHoldings;
-}
-
-// Get the row associated with the coin.
-function getCoinRow(coinName) {
-  return $("#balancesTable tr[data-url='" + coinName + "']");
-}
-
-// Returns the class of the change.
-function getChangeClass(changePercent) {
-  if (Math.abs(changePercent) < config.BALANCE_PRECISION) {
-    return "neutral";
-  } else if (changePercent < 0) {
-    return "negative";
-  } else {
-    return "positive";
-  }
 }
 
 // Computes the average buy price from the trade history.
@@ -438,24 +463,6 @@ function computeEarningsBtc(transactions) {
   }
 
   return earningsBtc;
-}
-
-// Fires the callback once the progress bar has loaded.
-function onProgressComplete(callback) {
-  var remainingTime = 30000;
-  var period = 10;
-  var interval = setInterval(function() {
-    remainingTime -= period;
-    if (remainingTime <= 0) {
-      clearInterval(interval);
-      return;
-    }
-    var style = $("#wdProgress").attr("style");
-    if (style && parseFloat(style.split(': ').pop()) >= 50) {
-      callback();
-      clearInterval(interval);
-    }
-  }, period);
 }
 
 // Computes the boundary transactions: deposits and withdrawals as the same
@@ -675,11 +682,18 @@ function addExtraBalanceTableColumns() {
                 });
               });
         }, /*forceRecompute=*/true);  // computeColumnsFromTradesAsync
-      });  // onAllComplete.
+      });  // onAllComplete
 }
 
 // Program entry point.
 function main() {
+  // Listen for storage changes.
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    if ("settings" in changes) {
+      applySettings(changes["settings"].newValue);
+    }
+  });
+
   // Match the page and apply a DOM layer.
   var doAdjustTheme = true;
   if (getPagePath().match(/balances.*/)) {
