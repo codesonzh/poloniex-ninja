@@ -82,7 +82,7 @@ improvements.
 
 This software comes with no warranty whatsoever. Any issue, damage or material
 loss occurred during the use of the software will not be reimbursed, repaired or
-otherwise acted upon from the authors. If you're using this software, you're
+otherwise acted upon by the authors. If you're using this software, you're
 willfully accepting the risk of a failure due to a bug, unexpected change of
 the Poloniex™ software or any other factor. Please review the LICENSE file for
 more details. The license is available at
@@ -98,7 +98,7 @@ software.
 The extension is only doing what any user with a browser and a developer console
 can achieve and does not use any exploits to achieve advantage as a trader. The
 only edge gained is less time doing side calculations using external tools and
-less probability of doing a mistake given all works as intended.
+a lower probability of making a mistake given all works as intended.
 
 The software reads available data for which the user gives permission and which
 the user itself can access and modifies parts of pages which are clearly visible
@@ -109,4 +109,3 @@ existing code of the website is ever getting modified or interfered with as this
 is built as a layer on top of the existing program (only in-memory DOM changes
 are applied). All computation is done in the browser tab and never leaves it's
 execution context (which is also achievable using the developer console).
-
