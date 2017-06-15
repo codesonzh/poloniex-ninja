@@ -53,3 +53,11 @@ td.poloniex-ninja.positive {
 .poloniex-ninja-stretch-6 {
   max-width: 1050px !important;
 }
+
+input.poloniex-ninja-donation-amount {
+  display: inline !important;
+  width: 80px !important;
+  border: 1px solid #ccc;
+  background: transparent;
+  text-align: right;
+}

@@ -1,4 +1,5 @@
-// From settings.js import EXTRA_BALANCE_COLUMNS, getAllSettings.
+// From settings.js import EXTRA_BALANCE_COLUMNS, DONATION_CONFIG,
+// getAllSettings.
 (function() {
 
 // TODO: Consider using config from Chrome sync storage.
@@ -561,11 +562,55 @@ function addExtraBalanceTableColumns() {
 
   state.data = {btcPrice: getBtcPriceEstimate()};
 
-  // Fix the dynamic rows on deposit/withdraw.
+  // Fix the dynamic rows on deposit/withdraw and add donation elements.
   $("#balancesTable tbody").on("DOMNodeInserted", "tr", function(e) {
     if ($(e.target).attr("id") == "actionRow") {
       $(e.target).find("td:first").attr(
           "colspan", $("#balancesTable thead tr th").length);
+
+      var currency = $(e.target).attr("currency");
+
+      // Remove previous donation elements.
+      var $withdrawDiv = $(e.target).find("#withdrawDiv");
+      $withdrawDiv.find(".poloniex-ninja").remove();
+
+      // Don't modify for unsupported donation currency.
+      if (!(currency in DONATION_CONFIG)) {
+        return;
+      }
+
+      console.info(
+          "PoloNinja: Adding donation context at bottom of withdrawal form.");
+
+      $donationRow =
+          $("<div class='formRow poloniex-ninja'>" +
+            "<img width='24' style='vertical-align:middle'> " +
+            "Find PoloNinja useful? " +
+            "<a href='javascript:' id='poloniex-ninja-fill-in-button'>" +
+            "<abbr title='By clicking this, it will only fill in the address " +
+                         "for the donation. You should then enter the amount " +
+                         "and submit yourself. Remember that you also have " +
+                         "to confirm the withdrawal by email.'>" +
+            "Fill in donation address</abbr> for " + currency + "</a>. " +
+            "Suggested amount: <input type='text' readonly " +
+            "class='poloniex-ninja-donation-amount'></div>");
+
+      var donation = DONATION_CONFIG[currency];
+      var fee = getFloatValueFromDom($withdrawDiv.find("#withdrawalTxFee"));
+      var amount = (donation.amount - fee).toFixed(config.COIN_DECIMALS);
+      $withdrawDiv.append($('<hr class="seperator poloniex-ninja">'));
+      $withdrawDiv.append($donationRow);
+      $donationRow.find(".poloniex-ninja-donation-amount").val(amount);
+      $donationRow.find("img:first").attr(
+          "src", chrome.extension.getURL("img/icon32x32.png"));
+      $donationRow.find('abbr[title!=""]').qtip({
+        content: { attr: 'title' },
+        style: { classes: 'qtip-dark qtip-rounded qtip-shadow poloTooltips' }
+      });
+      $donationRow.find("#poloniex-ninja-fill-in-button").click(function() {
+        var $address = $withdrawDiv.find("#withdrawalAddress");
+        $address.val(donation.address);
+      });
     }
   });
 

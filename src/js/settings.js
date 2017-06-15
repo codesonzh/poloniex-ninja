@@ -39,6 +39,28 @@ var DEFAULT_SETTINGS = {
       {})
 };
 
+// Addresses for donations via withdrawals.
+var DONATION_CONFIG = {
+  'BTC': {'address': '15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ',
+          'amount': '0.002'},
+  'DASH': {'address': 'XawQPh2Cy38iLXFvg3jYwDg4DHDucZVNpX',
+           'amount': '0.04'},
+  'ETH': {'address': '0x97b803032096a250079e6f84b4327cd0452c73ec',
+          'amount': '0.02'},
+  'ETC': {'address': '0x3571b4135b26e25b222dc72156f2cc4a7ff8a7a6',
+          'amount': '0.35'},
+  'LTC': {'address': 'LPcuzW4VPSYeCFcx32cqJnw3ugbnP8NFp1',
+          'amount': '0.2'},
+  'ZEC': {'address': 't1ZjicmTjARFdwDQyXG9Aim6ctmhwwaJY3x',
+          'amount': '0.015'},
+  'GNO': {'address':'0x97b803032096a250079e6f84b4327cd0452c73ec',
+          'amount': '0.025'},
+  'GNT': {'address': '0x97b803032096a250079e6f84b4327cd0452c73ec',
+          'amount': '11.0'},
+  'REP': {'address': '0x97b803032096a250079e6f84b4327cd0452c73ec',
+          'amount': '0.21'},
+};
+
 // Current settings.
 var SETTINGS = jQuery.extend(true, {}, DEFAULT_SETTINGS);
 
