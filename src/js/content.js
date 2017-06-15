@@ -324,13 +324,13 @@ function getTradeSummaryForRow($row, callback) {
 
   var currentBalance = getFloatValueFromDom($row.find("td.balance"));
   var btcValue = getFloatValueFromDom($row.find("td.value"));
-  var usdValue = getBtcPriceEstimate();
+  var btcPrice = getBtcPriceEstimate();
 
   var avgBuyPrice = state.avgBuyPriceOfCoin[coin];
   var avgBuyValue = avgBuyPrice * currentBalance;
   var changePercent = computeGrowthRate(avgBuyValue, btcValue);
   var earningsSlsBtc = state.earningsBtcOfCoin[coin];
-  var earningsSlsUsd = earningsSlsBtc * usdValue;
+  var earningsSlsUsd = earningsSlsBtc * btcPrice;
 
   callback({
     'avgBuyPrice': avgBuyPrice,
