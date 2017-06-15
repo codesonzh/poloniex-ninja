@@ -1,14 +1,43 @@
+// The extra column descriptors.
+var EXTRA_BALANCE_COLUMNS = [
+  {'key': 'avg_buy_price',
+   'title': 'AVG Buy Price',
+   'setting': 'AVG Buy Price',
+   'description': 'Average buy price of the coin based on your trades',
+   'default_visibility': true},
+  {'key': 'avg_buy_value',
+   'title': 'EST Buy Value',
+   'setting': 'EST Buy Value',
+   'description': 'Estimated coin value at the average buy price',
+   'default_visibility': true},
+  {'key': 'change_percent',
+   'title': 'Change',
+   'setting': 'Change since bought',
+   'description': 'Growth rate (change since bought)',
+   'default_visibility': true},
+  {'key': 'usd_value',
+   'title': 'USD Value',
+   'setting': 'USD Value',
+   'description': 'Estimated USD value of your coin holdings',
+   'default_visibility': true},
+  {'key': 'earnings_sls_btc',
+   'title': 'Earnings *',
+   'setting': 'Total earnings at last sale (BTC)',
+   'description': 'Total estimated earnings in BTC (last purchases excluded)',
+   'default_visibility': true},
+  {'key': 'earnings_sls_usd',
+   'title': 'USD Earn. *',
+   'setting': 'Total earnings at last sale (USD)',
+   'description': 'Total estimated earnings in USD (last purchases excluded)',
+   'default_visibility': true},
+];
+
 // Defaults for all settings.
 var DEFAULT_SETTINGS = {
-  'balance_column_visibility': {
-    "avg_buy_price": true,
-    "avg_buy_value": true,
-    "change_percent": true,
-    "usd_value": true,
-    "earnings_sls_btc": true,
-    "earnings_sls_usd": true,
-  }
-}
+  'balance_column_visibility': EXTRA_BALANCE_COLUMNS.reduce(
+      (map, col) => { map[col.key] = col.default_visibility; return map; },
+      {})
+};
 
 // Current settings.
 var SETTINGS = jQuery.extend(true, {}, DEFAULT_SETTINGS);

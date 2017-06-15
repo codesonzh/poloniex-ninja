@@ -1,3 +1,4 @@
+// From settings.js import EXTRA_BALANCE_COLUMNS, getAllSettings.
 (function() {
 
 // TODO: Consider using config from Chrome sync storage.
@@ -568,38 +569,10 @@ function addExtraBalanceTableColumns() {
     }
   });
 
-  // All the column descriptors.
-  var COLUMNS = [
-    {'key': 'avg_buy_price',
-     'title': 'AVG Buy Price',
-     'description': 'Average buy price of the coin based on your trades',
-     'default_visibility': true},
-    {'key': 'avg_buy_value',
-     'title': 'EST Buy Value',
-     'description': 'Estimated coin value at the average buy price',
-     'default_visibility': true},
-    {'key': 'change_percent',
-     'title': 'Change',
-     'description': 'Growth rate (change since bought)',
-     'default_visibility': true},
-    {'key': 'usd_value',
-     'title': 'USD Value',
-     'description': 'Estimated USD value of your coin holdings',
-     'default_visibility': true},
-    {'key': 'earnings_sls_btc',
-     'title': 'Earnings *',
-     'description': 'Total estimated earnings in BTC (last purchases excluded)',
-     'default_visibility': true},
-    {'key': 'earnings_sls_usd',
-     'title': 'USD Earn. *',
-     'description': 'Total estimated earnings in USD (last purchases excluded)',
-     'default_visibility': true},
-  ];
-
   // Attach headers.
   var $lastHeader = $("#balancesTable thead:first tr th:last");
-  for (var i = 0; i < COLUMNS.length; i++) {
-    var col = COLUMNS[i];
+  for (var i = 0; i < EXTRA_BALANCE_COLUMNS.length; i++) {
+    var col = EXTRA_BALANCE_COLUMNS[i];
     var header = col.title;
     var $th =
         $("<th class='poloniex-ninja " + col.key + "'>" + col.title + "</th>");
@@ -628,8 +601,8 @@ function addExtraBalanceTableColumns() {
 
     // Add placeholder cells.
     var $lastColumn = $row.find("td:last");
-    for (var i = 0; i < COLUMNS.length; i++) {
-      var col = COLUMNS[i];
+    for (var i = 0; i < EXTRA_BALANCE_COLUMNS.length; i++) {
+      var col = EXTRA_BALANCE_COLUMNS[i];
       $("<td class='poloniex-ninja " + col.key + "'>n/a</td>")
           .insertBefore($lastColumn);
     }

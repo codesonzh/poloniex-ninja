@@ -1,35 +1,33 @@
-$(function() {
-  // importing SETTINGS, getAllSettings, updateSettings, resetSettings
-  // from settings.js
+// from settings.js import EXTRA_BALANCE_COLUMNS, getAllSettings,
+// updateSettings, resetSettings.
+var app = angular.module('PoloniexNinja.Popup', ['ui.bootstrap']);
 
-  // Applies all settings to the UI.
+// Provides settings management in the extension popup.
+app.controller('SettingsController', function($scope) {
+  // The immutable extra balance column descriptor.
+  $scope.EXTRA_BALANCE_COLUMNS = EXTRA_BALANCE_COLUMNS;
+
+  // The global in-memory settings bound to scope.
+  $scope.settings = null;
+
+  // Applies the provided settings to the scope.
   function applySettings(settings) {
-    var visibility = settings['balance_column_visibility'];
-    for (var id in visibility) {
-      $(".visibility#" + id).prop("checked", visibility[id]);
-    }
+    $scope.$apply(function() {
+      $scope.settings = settings;
+    });
   }
 
-  // Load and apply all settings to the UI.
-  getAllSettings(applySettings);
-
-  // Apply tab functionality.
-  $('.nav-tabs a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show');
-  });
-
-  // Save settings as they change.
-  $(".visibility").change(function() {
-    var id = $(this).attr("id");
-    var checked = $(this).is(":checked");
-    SETTINGS['balance_column_visibility'][id] = checked;
-    updateSettings();
-  })
-
-  // Apply reset settings event.
-  $("#reset_settings").click(function() {
+  // Resets the settings to default.
+  $scope.resetSettings = function() {
     resetSettings(applySettings);
-  })
+  }
+
+  // Updates the settings (saves them).
+  $scope.updateSettings = function() {
+    updateSettings();
+  }
+
+  // Load settings and apply to scope.
+  getAllSettings(applySettings);
 })
 

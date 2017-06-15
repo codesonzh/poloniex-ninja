@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="PoloniexNinja.Popup">
   <head>
       <title>Poloniex™ Ninja Chrome Extension</title>
       <meta charset="UTF-8">
@@ -8,17 +8,13 @@
   <body style="width: 450px; min-height: 520px; padding: 8px;
                background: url('/img/ninja-faded.png') bottom right no-repeat">
     <div class="container">
-      <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#about">About Poloniex™ Ninja</a></li>
-        <li ><a data-toggle="tab" href="#settings">Settings</a></li>
-      </ul>
-
-      <div class="tab-content">
-        <div id="about" class="tab-pane fade in active">
+      <uib-tabset active="active">
+        <uib-tab index="0" heading="About Poloniex™ Ninja">
           <div class="text-center">
             <h3>Have you become a PoloNinja yet?</h3>
             <p>Poloniex™ Ninja is free, now and forever.</p>
-            <p>Consider donating <strong>0.002 Bitcoin</strong> or more to this address:</p>
+            <p>Consider donating <strong>0.002 Bitcoin</strong>
+               or more to this address:</p>
 
             <h4 style="color: #2244DD; font-family: monospace; margin: 0px;">
               15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ
@@ -39,7 +35,8 @@
 
             <hr>
 
-            <a href="https://github.com/codesonzh/poloniex-ninja" target="_blank">
+            <a href="https://github.com/codesonzh/poloniex-ninja"
+               target="_blank">
               Poloniex™ Ninja source code</a>
             |
             <a href="https://github.com/codesonzh/poloniex-ninja/issues/new"
@@ -47,65 +44,40 @@
               Send feedback
             </a>
           </div>
-        </div>
-        <div id="settings" class="tab-pane fade">
-          <div class="pull-right">
-            <button class="btn btn-sm btn-primary" id="reset_settings">
-              Reset to defaults
-            </button>
-          </div>
-          <h3>Settings</h3>
+        </uib-tab>
+        <uib-tab index="1" heading="Settings">
+          <div ng-controller="SettingsController">
+            <div class="pull-right">
+              <button class="btn btn-sm btn-primary" ng-click="resetSettings()">
+                Reset to defaults
+              </button>
+            </div>
+            <h3>Settings</h3>
 
-          <strong>Display extra balance columns:</strong><br><br>
-          <ul class="nav nav-pills nav-stacked">
-            <li>
-              <label>
-                <input type="checkbox" id="avg_buy_price" class="visibility">
-                <span>AVG Buy Price</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" id="avg_buy_value" class="visibility">
-                <span>EST Buy Value</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" id="change_percent" class="visibility">
-                <span>Change since bought</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" id="usd_value" class="visibility">
-                <span>USD Value</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" id="earnings_sls_btc" class="visibility">
-                <span>Total earnings at last sale (BTC)</span>
-              </label>
-            </li>
-            <li>
-              <label>
-                <input type="checkbox" id="earnings_sls_usd" class="visibility">
-                <span>Total earnings at last sale (USD)</span>
-              </label>
-            </li>
-          </ul>
-          <hr>
-          <p>
-            Special thanks to
-            <a href="https://github.com/Zettt" target="_blank">Zettt</a>
-            for suggesting the column toggle feature.
-          </p>
-        </div>
-      </div>
+            <strong>Display extra balance columns:</strong><br><br>
+            <ul class="nav nav-pills nav-stacked">
+              <li ng-repeat="col in EXTRA_BALANCE_COLUMNS">
+                <label>
+                  <input type="checkbox" id="{{col.key}}"
+                         ng-model="settings.balance_column_visibility[col.key]"
+                         ng-change="updateSettings()">
+                  <span title="{{col.description}}">{{col.setting}}</span>
+                </label>
+              </li>
+            </ul>
+            <hr>
+            <p>
+              Special thanks to
+              <a href="https://github.com/Zettt" target="_blank">Zettt</a>
+              for suggesting the column toggle feature.
+            </p>
+          </div>
+        </uib-tab>
+      </uib-tabset>
     </div>
     <script src="/js/jquery-2.1.3.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular-1.6.4.min.js"></script>
+    <script src="/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
     <script src="/js/settings.js"></script>
     <script src="/js/popup.js"></script>
   </body>
