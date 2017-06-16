@@ -27,7 +27,7 @@ td.poloniex-ninja.positive {
 }
 
 .poloniex-ninja-hidden {
-  display: none;
+  display: none !important;
 }
 
 .poloniex-ninja-stretch-0 {
@@ -60,4 +60,13 @@ input.poloniex-ninja-donation-amount {
   border: 1px solid #ccc;
   background: transparent;
   text-align: right;
+}
+
+.poloniex-ninja-dark input.poloniex-ninja-donation-amount {
+    border: 1px solid #4e696c;
+}
+
+.poloniex-ninja-donation .icon {
+  vertical-align: bottom;
+  margin-right: 5px;
 }

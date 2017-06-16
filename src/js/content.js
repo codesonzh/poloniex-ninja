@@ -1,5 +1,5 @@
-// From settings.js import EXTRA_BALANCE_COLUMNS, DONATION_CONFIG,
-// getAllSettings.
+// From settings.js import EXTRA_BALANCE_COLUMNS, DONATION_CONFIG, SETTINGS,
+// loadSettings, saveSettings, onSettingsChanged.
 (function() {
 
 // TODO: Consider using config from Chrome sync storage.
@@ -129,7 +129,28 @@ function computeGrowthRate(oldValue, newValue) {
 
 // Applies all settings to the page.
 function applySettings(settings) {
-  updateColumnVisibility(settings['balance_column_visibility']);
+  setColumnVisibility(settings.balance_column_visibility);
+  setDonationInfoVisibility(settings.display_withdrawal_donation);
+}
+
+// Apply DOM changes to directives.
+function digestDomDirectives(context) {
+  var $el = $(context || "body");
+
+  // Apply tooltips to abbr elements.
+  $el.find("abbr[title!='']").qtip({
+    content: { attr: 'title' },
+    style: { classes: 'qtip-dark qtip-rounded qtip-shadow poloTooltips' }
+  });
+
+  // Apply changes to images referencing extension data.
+  $el.find("img[data-ext-src!='']").each(function() {
+    var $img = $(this);
+    var extSrc = $img.attr("data-ext-src");
+    var extUrl = chrome.extension.getURL(extSrc);
+    $img.attr("src", extUrl);
+    $img.removeAttr("data-ext-src");
+  });
 }
 
 // Loads the cached state from Chrome local storage.
@@ -170,7 +191,7 @@ function adjustTheme() {
 
 // Updates column visibility from the settings object and adjusts the table
 // width according to number of visible columns.
-function updateColumnVisibility(visibility) {
+function setColumnVisibility(visibility) {
   var visibleColumnCount = 0;
   for (var column in visibility) {
     var $el = $(".poloniex-ninja." + column);
@@ -191,6 +212,81 @@ function updateColumnVisibility(visibility) {
         return c.replace(/(^|\s)poloniex-ninja-stretch-\w+/g, '');
       })
       .addClass("poloniex-ninja-stretch-" + visibleColumnCount);
+}
+
+// Sets donation at withdrawls visibility.
+function setDonationInfoVisibility(visible) {
+  if (visible) {
+    $(".poloniex-ninja-donation").removeClass("poloniex-ninja-hidden");
+    attachDonationInfo();
+  } else {
+    $(".poloniex-ninja-donation").addClass("poloniex-ninja-hidden");
+  }
+}
+
+// Adds extra info for donations to the provided action row or the one visible.
+// The method will check for existance of a donation row and current settings
+// before deciding to attach the new DOM.
+function attachDonationInfo($actionRow) {
+  var $actionRow = $actionRow || $("#actionRow:first");
+
+  if ($actionRow.length == 0)
+    return;
+
+  var currency = $actionRow.attr("currency");
+
+  // Remove previous donation elements.
+  var $withdrawDiv = $actionRow.find("#withdrawDiv");
+  $withdrawDiv.find(".poloniex-ninja-donation").remove();
+
+  // Don't modify for unsupported donation currency.
+  if (!(currency in DONATION_CONFIG)) {
+    return;
+  }
+
+  if (!SETTINGS.display_withdrawal_donation) {
+    return;
+  }
+
+  console.info(
+      "PoloNinja: Adding donation info at bottom of withdrawal form.");
+
+  $donationRow =
+      $("<div class='formRow poloniex-ninja-donation'>" +
+        "<img width='24' class='icon' data-ext-src='img/icon32x32.png'> " +
+        "Find PoloNinja useful? " +
+        "<a href='javascript:' id='poloniex-ninja-fill-in-button' " +
+           "class='matchLink'>" +
+        "<abbr title='By clicking this, it will only fill in the address " +
+                     "for the donation. You should then enter the amount " +
+                     "and submit yourself. Remember that you also have " +
+                     "to confirm the withdrawal by email.'>" +
+        "Click to fill in donation address</abbr></a> for " + currency + ". " +
+        "Suggested amount: " +
+        "<input type='text' readonly class='poloniex-ninja-donation-amount'> " +
+        "&nbsp;|&nbsp; " +
+        "<a href='javascript:' id='poloniex-ninja-hide-donation-info' " +
+           "class='matchLink'><abbr title='You can show this again via " +
+        "settings: find the PoloNinja icon in Chrome toolbox.'>Hide</abbr>" +
+        "</a></div>");
+
+  var donation = DONATION_CONFIG[currency];
+  var fee = getFloatValueFromDom($withdrawDiv.find("#withdrawalTxFee"));
+  var amount = (donation.amount - fee).toFixed(config.COIN_DECIMALS);
+  $withdrawDiv.append($('<hr class="seperator poloniex-ninja-donation">'));
+  $withdrawDiv.append($donationRow);
+  $donationRow.find(".poloniex-ninja-donation-amount").val(amount);
+  $donationRow.find("#poloniex-ninja-fill-in-button").click(function() {
+    var $address = $withdrawDiv.find("#withdrawalAddress");
+    $address.val(donation.address);
+  });
+  $donationRow.find("#poloniex-ninja-hide-donation-info").click(function() {
+    updateSettings(function(settings) {
+      settings.display_withdrawal_donation = false;
+    });
+  });
+
+  digestDomDirectives($donationRow);
 }
 
 // Fires the callback once the progress bar has loaded.
@@ -567,50 +663,7 @@ function addExtraBalanceTableColumns() {
     if ($(e.target).attr("id") == "actionRow") {
       $(e.target).find("td:first").attr(
           "colspan", $("#balancesTable thead tr th").length);
-
-      var currency = $(e.target).attr("currency");
-
-      // Remove previous donation elements.
-      var $withdrawDiv = $(e.target).find("#withdrawDiv");
-      $withdrawDiv.find(".poloniex-ninja").remove();
-
-      // Don't modify for unsupported donation currency.
-      if (!(currency in DONATION_CONFIG)) {
-        return;
-      }
-
-      console.info(
-          "PoloNinja: Adding donation context at bottom of withdrawal form.");
-
-      $donationRow =
-          $("<div class='formRow poloniex-ninja'>" +
-            "<img width='24' style='vertical-align:middle'> " +
-            "Find PoloNinja useful? " +
-            "<a href='javascript:' id='poloniex-ninja-fill-in-button'>" +
-            "<abbr title='By clicking this, it will only fill in the address " +
-                         "for the donation. You should then enter the amount " +
-                         "and submit yourself. Remember that you also have " +
-                         "to confirm the withdrawal by email.'>" +
-            "Fill in donation address</abbr> for " + currency + "</a>. " +
-            "Suggested amount: <input type='text' readonly " +
-            "class='poloniex-ninja-donation-amount'></div>");
-
-      var donation = DONATION_CONFIG[currency];
-      var fee = getFloatValueFromDom($withdrawDiv.find("#withdrawalTxFee"));
-      var amount = (donation.amount - fee).toFixed(config.COIN_DECIMALS);
-      $withdrawDiv.append($('<hr class="seperator poloniex-ninja">'));
-      $withdrawDiv.append($donationRow);
-      $donationRow.find(".poloniex-ninja-donation-amount").val(amount);
-      $donationRow.find("img:first").attr(
-          "src", chrome.extension.getURL("img/icon32x32.png"));
-      $donationRow.find('abbr[title!=""]').qtip({
-        content: { attr: 'title' },
-        style: { classes: 'qtip-dark qtip-rounded qtip-shadow poloTooltips' }
-      });
-      $donationRow.find("#poloniex-ninja-fill-in-button").click(function() {
-        var $address = $withdrawDiv.find("#withdrawalAddress");
-        $address.val(donation.address);
-      });
+      attachDonationInfo($(e.target));
     }
   });
 
@@ -660,7 +713,7 @@ function addExtraBalanceTableColumns() {
        'loadTransactions': [loadTransactions, function() { return {}; }]},
       function() {
         // Apply current settings.
-        getAllSettings(applySettings);
+        loadSettings(applySettings);
 
         computeColumnsFromTradesAsync(function() {
           var $filterable = $("#balancesTable tbody tr.filterable");
@@ -705,13 +758,6 @@ function addExtraBalanceTableColumns() {
 
 // Program entry point.
 function main() {
-  // Listen for storage changes.
-  chrome.storage.onChanged.addListener(function(changes, namespace) {
-    if ("settings" in changes) {
-      applySettings(changes["settings"].newValue);
-    }
-  });
-
   // Match the page and apply a DOM layer.
   var doAdjustTheme = true;
   if (getPagePath().match(/balances.*/)) {
@@ -727,8 +773,11 @@ function main() {
     adjustTheme();
   }
 
-  // Apply current settings.
-  getAllSettings(applySettings);
+  // Load and apply current settings.
+  loadSettings(applySettings);
+
+  // Listen for live settings changes.
+  onSettingsChanged(applySettings);
 }
 
 main();

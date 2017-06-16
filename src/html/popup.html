@@ -60,11 +60,26 @@
                 <label>
                   <input type="checkbox" id="{{col.key}}"
                          ng-model="settings.balance_column_visibility[col.key]"
-                         ng-change="updateSettings()">
+                         ng-change="saveSettings()">
                   <span title="{{col.description}}">{{col.setting}}</span>
                 </label>
               </li>
             </ul>
+
+            <hr>
+
+            <strong>Donations:</strong><br><br>
+            <ul class="nav nav-pills nav-stacked">
+              <li>
+                <label>
+                  <input type="checkbox" id="display_withdrawal_donation"
+                         ng-model="settings.display_withdrawal_donation"
+                         ng-change="saveSettings()">
+                  <span>Display donation info at withdrawal form</span>
+                </label>
+              </li>
+            </ul>
+
             <hr>
             <p>
               Special thanks to

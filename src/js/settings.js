@@ -36,7 +36,8 @@ var EXTRA_BALANCE_COLUMNS = [
 var DEFAULT_SETTINGS = {
   'balance_column_visibility': EXTRA_BALANCE_COLUMNS.reduce(
       (map, col) => { map[col.key] = col.default_visibility; return map; },
-      {})
+      {}),
+  'display_withdrawal_donation': true
 };
 
 // Addresses for donations via withdrawals.
@@ -64,35 +65,25 @@ var DONATION_CONFIG = {
 // Current settings.
 var SETTINGS = jQuery.extend(true, {}, DEFAULT_SETTINGS);
 
-// Updates the extension settings in chrome sync storage.
-function updateSettings(callback) {
-  // Get a value saved in a form.
-  // Save it using the Chrome extension storage API.
-  chrome.storage.sync.set({'settings': SETTINGS}, function() {
-    if (callback) {
-      callback(SETTINGS);
+// Merges current global in-memory settings with new settings.
+function mergeSettings(settings) {
+  for (var i in settings) {
+    if ((typeof settings[i]) == "object") {
+      for (var j in settings[i]) {
+        SETTINGS[i][j] = settings[i][j];
+      }
+    } else {
+      SETTINGS[i] = settings[i];
     }
-  });
-}
-
-// Loads the current settings and provides the inner setting with provided key
-// to the callback.
-function getSettings(key, callback) {
-  chrome.storage.sync.get('settings', function(r) {
-    callback(r.settings[key]);
-  });
+  }
 }
 
 // Loads all settings and passes them to the callback.
-function getAllSettings(callback) {
+function loadSettings(callback) {
   chrome.storage.sync.get('settings', function(r) {
     // Update all in-memory settings from storage.
     try {
-      for (var i in r.settings) {
-        for (var j in r.settings[i]) {
-          SETTINGS[i][j] = r.settings[i][j];
-        }
-      }
+      mergeSettings(r.settings);
     } catch (ex) {
       resetSettings();
     }
@@ -102,11 +93,36 @@ function getAllSettings(callback) {
   });
 }
 
-// Resets all settings to defaults.
-function resetSettings(callback) {
-  SETTINGS = jQuery.extend(true, {}, DEFAULT_SETTINGS);
-  updateSettings(callback);
+// Updates the extension settings in chrome sync storage.
+function saveSettings(callback) {
+  // Get a value saved in a form.
+  // Save it using the Chrome extension storage API.
+  chrome.storage.sync.set({'settings': SETTINGS}, function() {
+    console.info("PoloNinja: Settings saved.");
+    if (callback) {
+      callback(SETTINGS);
+    }
+  });
 }
 
-// Load up initial settings.
-getAllSettings();
+// Updates current settings via updateCallback and saves them.
+function updateSettings(updateCallback, saveCallback) {
+  updateCallback(SETTINGS);
+  saveSettings(saveCallback);
+}
+
+// Attaches a listener for settings changes.
+function onSettingsChanged(callback) {
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    if ("settings" in changes) {
+      mergeSettings(changes["settings"].newValue);
+      callback(SETTINGS);
+    }
+  });
+}
+
+// Resets all settings to defaults.
+function resetSettings(callback) {
+  mergeSettings(DEFAULT_SETTINGS);
+  saveSettings(callback);
+}

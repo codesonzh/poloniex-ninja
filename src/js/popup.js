@@ -1,5 +1,5 @@
 // from settings.js import EXTRA_BALANCE_COLUMNS, getAllSettings,
-// updateSettings, resetSettings.
+// saveSettings, resetSettings.
 var app = angular.module('PoloniexNinja.Popup', ['ui.bootstrap']);
 
 // Provides settings management in the extension popup.
@@ -23,11 +23,11 @@ app.controller('SettingsController', function($scope) {
   }
 
   // Updates the settings (saves them).
-  $scope.updateSettings = function() {
-    updateSettings();
+  $scope.saveSettings = function() {
+    saveSettings();
   }
 
   // Load settings and apply to scope.
-  getAllSettings(applySettings);
+  loadSettings(applySettings);
 })
 
