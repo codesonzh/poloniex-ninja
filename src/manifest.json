@@ -2,48 +2,51 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.poloniex.com/*", 
+        "https://www.poloniex.com/*",
         "https://poloniex.com/*"
-      ], 
-      "run_at": "document_end", 
+      ],
+      "js": [
+        "js/jquery-2.1.3.min.js",
+        "js/jquery.qtip.min.js",
+        "js/settings.js",
+        "js/content.js"
+      ],
       "css": [
         "css/content-style.css"
-      ], 
-      "js": [
-        "js/jquery-2.1.3.min.js", 
-        "js/jquery.qtip.min.js", 
-        "js/settings.js", 
-        "js/content.js"
-      ]
+      ],
+      "run_at": "document_end"
     }
-  ], 
-  "description": "Improved overview of crypto balance on Poloniex\u2122: buy price, growth rate and USD value of your bitcoin, ethereum and altcoins.", 
-  "short_name": "poloninja", 
+  ],
+  "description": "Improved overview of crypto balance on Poloniex\u2122: buy price, growth rate and USD value of your bitcoin, ethereum and altcoins.",
+  "short_name": "poloninja",
+  "author": "codesonzh (@codesonzh)",
+  "web_accessible_resources": [
+    "img/icon32x32.png"
+  ],
+  "manifest_version": 2,
   "icons": {
-    "128": "img/icon128x128.png", 
-    "32": "img/icon32x32.png", 
-    "64": "img/icon64x64.png", 
-    "48": "img/icon48x48.png", 
+    "128": "img/icon128x128.png",
+    "32": "img/icon32x32.png",
+    "64": "img/icon64x64.png",
+    "48": "img/icon48x48.png",
     "16": "img/icon16x16.png"
-  }, 
-  "author": "codesonzh (@codesonzh)", 
+  },
+  "name": "Poloniex\u2122 Ninja",
+  "homepage_url": "https://github.com/codesonzh/poloniex-ninja",
+  "version": "0.0.36",
   "background": {
     "scripts": [
       "js/background.js"
     ]
-  }, 
-  "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.35", 
-  "manifest_version": 2, 
-  "content_security_policy": "script-src 'self' https://www.poloniex.com https://poloniex.com; object-src 'self'", 
+  },
+  "content_security_policy": "script-src 'self' https://www.poloniex.com https://poloniex.com; object-src 'self'",
   "browser_action": {
-    "default_icon": "img/icon128x128.png", 
+    "default_icon": "img/icon128x128.png",
     "default_popup": "html/popup.html"
-  }, 
+  },
   "permissions": [
-    "https://www.poloniex.com/", 
-    "https://poloniex.com/", 
+    "https://www.poloniex.com/",
+    "https://poloniex.com/",
     "storage"
-  ], 
-  "name": "Poloniex\u2122 Ninja"
+  ]
 }
