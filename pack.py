@@ -3,6 +3,7 @@
 import os
 import zipfile
 import json
+from collections import OrderedDict
 
 def make_zipfile(output_filename, source_dir):
   relroot = os.path.abspath(source_dir)
@@ -30,7 +31,7 @@ def increase_version(major, minor, build):
 
 def upgrade_version(manifest_path):
   with open(manifest_path, "r") as f:
-    manifest = json.load(f)
+    manifest = json.load(f, object_pairs_hook=OrderedDict)
   parts = [int(part) for part in manifest["version"].split(".")]
   version = increase_version(*parts)
   version = ".".join([str(part) for part in version])

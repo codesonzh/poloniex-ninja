@@ -14,11 +14,13 @@
   "author": "codesonzh (@codesonzh)", 
   "background": {
     "scripts": [
+      "js/jquery-2.1.3.min.js", 
+      "js/settings.js", 
       "js/background.js"
     ]
   }, 
   "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.38", 
+  "version": "0.0.39", 
   "manifest_version": 2, 
   "content_scripts": [
     {
@@ -46,7 +48,8 @@
   "permissions": [
     "https://www.poloniex.com/", 
     "https://poloniex.com/", 
-    "storage"
+    "storage", 
+    "contextMenus"
   ], 
   "name": "Poloniex\u2122 Ninja"
 }

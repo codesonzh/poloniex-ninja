@@ -32,17 +32,6 @@ var EXTRA_BALANCE_COLUMNS = [
    'default_visibility': true},
 ];
 
-// Defaults for all settings.
-var DEFAULT_SETTINGS = {
-  'balance_column_visibility': EXTRA_BALANCE_COLUMNS.reduce(
-      (map, col) => { map[col.key] = col.default_visibility; return map; },
-      {}),
-  'display_withdrawal_donation': true,
-  'balance_row_filters': {
-    'hide_untraded': false
-  }
-};
-
 // Addresses for donations via withdrawals.
 var DONATION_CONFIG = {
   'BTC': {'address': '15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ',
@@ -64,6 +53,59 @@ var DONATION_CONFIG = {
   'REP': {'address': '0x97b803032096a250079e6f84b4327cd0452c73ec',
           'amount': '0.21'},
 };
+
+// Defaults for all settings.
+var DEFAULT_SETTINGS = {
+  'balance_column_visibility': EXTRA_BALANCE_COLUMNS.reduce(
+      (map, col) => { map[col.key] = col.default_visibility; return map; },
+      {}),
+  'display_withdrawal_donation': true,
+  'balance_row_filters': {
+    'hide_untraded': false
+  }
+};
+
+// The context menu options and links.
+var CONTEXT_MENU = [
+  {'type': 'normal',
+   'key': 'balance_column_visibility',
+   'title': 'Extra columns',
+   'children': EXTRA_BALANCE_COLUMNS.map(
+          function (col) {
+            return {'type': 'checkbox',
+                    'key': col.key,
+                    'title': col.title,
+                    'path': 'balance_column_visibility.' + col.key}
+          })},
+  {'type': 'separator'},
+  {'type': 'normal',
+   'key': 'donate',
+   'title': 'Buy me a coffee (or beer)',
+   'url': 'http://bit.ly/polo-ninja-coffee'},
+  {'type': 'separator'},
+  {'type': 'normal',
+   'key': 'rate_extension',
+   'title': 'Rate extension',
+   'url': 'http://bit.ly/polo-ninja'},
+  {'type': 'normal',
+   'key': 'send_feedback',
+   'title': 'Send feedback',
+   'url': 'https://github.com/codesonzh/poloniex-ninja/issues/new'},
+  {'type': 'normal',
+   'key': 'follow_on_twitter',
+   'title': 'Follow me on Twitter',
+   'url': 'https://twitter.com/codesonzh'},
+  {'type': 'normal',
+   'key': 'view_source_code',
+   'title': 'View source on Github',
+   'url': 'https://github.com/codesonzh/poloniex-ninja'},
+];
+
+// List of URLs where to show the context menu.
+var CONTEXT_MENU_URL_PATTERNS = [
+  "https://www.poloniex.com/*",
+  "https://poloniex.com/*"
+];
 
 // Current settings.
 var SETTINGS = jQuery.extend(true, {}, DEFAULT_SETTINGS);
@@ -128,4 +170,69 @@ function onSettingsChanged(callback) {
 function resetSettings(callback) {
   mergeSettings(DEFAULT_SETTINGS);
   saveSettings(callback);
+}
+
+// Sets value inside object referenced by dot separated path.
+function setByPath(path, value, settings) {
+  var parts = path.split('.');
+  var endKey = parts.pop();
+  var setting = settings || SETTINGS;
+  for (var i = 0; i < parts.length; i++) {
+    setting = setting[parts[i]];
+  }
+  setting[endKey] = value;
+}
+
+// Returns value from object referenced by dot separated path.
+function getByPath(path, settings) {
+  var parts = path.split('.');
+  var endKey = parts.pop();
+  var setting = settings || SETTINGS;
+  for (var i = 0; i < parts.length; i++) {
+    setting = setting[parts[i]];
+  }
+  return setting[endKey];
+}
+
+// Creates the context menu with settings and links.
+function createContextMenu(options, parent, settings) {
+  var options = options || CONTEXT_MENU;
+  var parent = parent ||
+      chrome.contextMenus.create({
+        "title": "Poloniex\u2122 Ninja",
+        "documentUrlPatterns": CONTEXT_MENU_URL_PATTERNS,
+        "contexts": ["page"]
+      });
+  var settings = settings || SETTINGS;
+
+  for (var i = 0; i < options.length; i++) {
+    var option = options[i];
+    var menuItemDescriptor = {"parentId": parent,
+                              "type": option.type};
+    if ("title" in option) {
+      menuItemDescriptor.title = option.title;
+    }
+
+    if (option.type == "checkbox") {
+      menuItemDescriptor.checked = getByPath(option.path, settings);
+      menuItemDescriptor.onclick = (function(path) {
+        return function(info, tab) {
+          updateSettings(function(settings) {
+            setByPath(path, info.checked, settings);
+          });
+        }
+      })(option.path);
+    } else if (option.type == "normal" && option.url) {
+      menuItemDescriptor.onclick = (function(url) {
+        return function(info, tab) {
+          chrome.tabs.create({url: url});
+        }
+      })(option.url);
+    }
+
+    var menuItem = chrome.contextMenus.create(menuItemDescriptor);
+    if ("children" in option) {
+      createContextMenu(option.children, menuItem, settings);
+    }
+  }
 }
