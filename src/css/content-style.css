@@ -6,12 +6,23 @@ td.poloniex-ninja {
   background-color: #f2faff !important;
 }
 
+span.poloniex-ninja-filter-option {
+  background-color: #f2faff !important;
+  border: 1px solid #8cbcbd;
+  padding-left: 3px;
+}
+
 .poloniex-ninja-dark th.poloniex-ninja {
   background-color: #546362 !important;
 }
 
 .poloniex-ninja-dark td.poloniex-ninja {
   background-color: #2b3737 !important;
+}
+
+.poloniex-ninja-dark span.poloniex-ninja-filter-option {
+  background-color: #2b3737 !important;
+  border: 1px solid #546362;
 }
 
 td.poloniex-ninja.neutral {
@@ -47,7 +58,7 @@ td.poloniex-ninja.positive {
 }
 
 .poloniex-ninja-stretch-5 {
-  max-width: 960px !important;
+  max-width: 990px !important;
 }
 
 .poloniex-ninja-stretch-6 {
@@ -69,4 +80,8 @@ input.poloniex-ninja-donation-amount {
 .poloniex-ninja-donation .icon {
   vertical-align: bottom;
   margin-right: 5px;
+}
+
+.poloniex-ninja-filtered-untraded .poloniex-ninja-untraded {
+  display: none;
 }

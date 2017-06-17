@@ -37,7 +37,10 @@ var DEFAULT_SETTINGS = {
   'balance_column_visibility': EXTRA_BALANCE_COLUMNS.reduce(
       (map, col) => { map[col.key] = col.default_visibility; return map; },
       {}),
-  'display_withdrawal_donation': true
+  'display_withdrawal_donation': true,
+  'balance_row_filters': {
+    'hide_untraded': false
+  }
 };
 
 // Addresses for donations via withdrawals.

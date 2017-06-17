@@ -4,6 +4,22 @@
   ], 
   "description": "Improved overview of crypto balance on Poloniex\u2122: buy price, growth rate and USD value of your bitcoin, ethereum and altcoins.", 
   "short_name": "poloninja", 
+  "icons": {
+    "128": "img/icon128x128.png", 
+    "32": "img/icon32x32.png", 
+    "64": "img/icon64x64.png", 
+    "48": "img/icon48x48.png", 
+    "16": "img/icon16x16.png"
+  }, 
+  "author": "codesonzh (@codesonzh)", 
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ]
+  }, 
+  "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
+  "version": "0.0.38", 
+  "manifest_version": 2, 
   "content_scripts": [
     {
       "matches": [
@@ -22,22 +38,6 @@
       ]
     }
   ], 
-  "author": "codesonzh (@codesonzh)", 
-  "background": {
-    "scripts": [
-      "js/background.js"
-    ]
-  }, 
-  "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.37", 
-  "manifest_version": 2, 
-  "icons": {
-    "128": "img/icon128x128.png", 
-    "32": "img/icon32x32.png", 
-    "64": "img/icon64x64.png", 
-    "48": "img/icon48x48.png", 
-    "16": "img/icon16x16.png"
-  }, 
   "content_security_policy": "script-src 'self' https://www.poloniex.com https://poloniex.com; object-src 'self'", 
   "browser_action": {
     "default_icon": "img/icon128x128.png", 

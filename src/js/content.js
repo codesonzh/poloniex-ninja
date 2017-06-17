@@ -131,6 +131,8 @@ function computeGrowthRate(oldValue, newValue) {
 function applySettings(settings) {
   setColumnVisibility(settings.balance_column_visibility);
   setDonationInfoVisibility(settings.display_withdrawal_donation);
+  setUntradedRowVisibility(!settings.balance_row_filters.hide_untraded);
+  applyFilterContext();
 }
 
 // Apply DOM changes to directives.
@@ -151,6 +153,13 @@ function digestDomDirectives(context) {
     $img.attr("src", extUrl);
     $img.removeAttr("data-ext-src");
   });
+}
+
+// Synchronizes existing and extra options with section applied filter logic.
+function applyFilterContext() {
+  var anyFilterApplied =
+        $(".utilities input[type=checkbox]:checked").length > 0;
+    $("section#balances").toggleClass("filtered", anyFilterApplied);
 }
 
 // Loads the cached state from Chrome local storage.
@@ -221,6 +230,20 @@ function setDonationInfoVisibility(visible) {
     attachDonationInfo();
   } else {
     $(".poloniex-ninja-donation").addClass("poloniex-ninja-hidden");
+  }
+}
+
+// Sets visibility for rows which haven't been traded.
+function setUntradedRowVisibility(visible) {
+  // Apply class which will hide all untraded rows.
+  $("#balancesTable tbody").toggleClass("poloniex-ninja-filtered-untraded",
+                                        !visible);
+  // Also update the checkbox state.
+  var $hideUntraded = $("#poloniex-ninja-hide-untraded");
+  var isChecked = $hideUntraded.is(":checked");
+  var shouldBeChecked = !visible;
+  if (isChecked != shouldBeChecked) {
+    $hideUntraded.prop('checked', shouldBeChecked);
   }
 }
 
@@ -410,10 +433,15 @@ function getCoinRow(coinName) {
   return $("#balancesTable tr[data-url='" + coinName + "']");
 }
 
+// Returns the coin name of provided row.
+function getRowCoin($row) {
+  return $row.attr("data-url");
+}
+
 // Fetches the cached historical trade data for a given row and calls the
 // callback if data is available.
 function getTradeSummaryForRow($row, callback) {
-  var coin = $row.find("td.coin").text();
+  var coin = getRowCoin($row);
   if (coin == null || state.avgBuyPriceOfCoin == null ||
       !(coin in state.avgBuyPriceOfCoin)) {
     return;
@@ -421,29 +449,24 @@ function getTradeSummaryForRow($row, callback) {
 
   var currentBalance = getFloatValueFromDom($row.find("td.balance"));
   var btcValue = getFloatValueFromDom($row.find("td.value"));
-  var btcPrice = getBtcPriceEstimate();
 
   var avgBuyPrice = state.avgBuyPriceOfCoin[coin];
   var avgBuyValue = avgBuyPrice * currentBalance;
   var changePercent = computeGrowthRate(avgBuyValue, btcValue);
-  var earningsSlsBtc = state.earningsBtcOfCoin[coin];
-  var earningsSlsUsd = earningsSlsBtc * btcPrice;
 
   callback({
     'avgBuyPrice': avgBuyPrice,
     'avgBuyValue': avgBuyValue,
-    'changePercent': changePercent,
-    'earningsSlsBtc': earningsSlsBtc,
-    'earningsSlsUsd': earningsSlsUsd,
+    'changePercent': changePercent
   });
 }
 
 // Updates USD balance on each row.
-function updateUsdBalance($rowQuery) {
-  $rowQuery.eachAsync(function() {
-    if (!state.data)
-      return;
+function updateUsdBalanceColumn($rowQuery) {
+  if (!state.data)
+    return;
 
+  $rowQuery.eachAsync(function() {
     var $row = $(this);
     var bitcoinValue = getBitcoinValue($row);
 
@@ -465,19 +488,46 @@ function updateTradeColumns($rowQuery) {
     getTradeSummaryForRow($row, function(r) {
       var $avgBuyPriceCell = $row.find("td.avg_buy_price");
       var $avgBuyValueCell = $row.find("td.avg_buy_value");
-      var $earningsSlsBtcCell = $row.find("td.earnings_sls_btc");
-      var $earningsSlsUsdCell = $row.find("td.earnings_sls_usd");
       $avgBuyPriceCell.html(
           r.avgBuyPrice.toFixed(config.COIN_DECIMALS));
       $avgBuyValueCell.html(
           r.avgBuyValue.toFixed(config.COIN_DECIMALS));
-      $earningsSlsBtcCell.html(
-          formatAsChange(r.earningsSlsBtc, config.COIN_DECIMALS));
-      applyChangeClass($earningsSlsBtcCell, r.earningsSlsBtc);
-      $earningsSlsUsdCell.html(
-          '$ ' + formatAsChange(r.earningsSlsUsd, config.USD_DECIMALS));
-      applyChangeClass($earningsSlsUsdCell, r.earningsSlsUsd);
     });
+  });
+}
+
+// Updates the earnings columns on each row. If no earnings available, the row
+// is declared as untraded.
+function updateEarningColumns($rowQuery) {
+  if (!state.earningsBtcOfCoin)
+    return;
+
+  $rowQuery.eachAsync(function() {
+    var $row = $(this);
+    var coin = getRowCoin($row);
+    if (coin == null)
+        return;
+
+    if (!(coin in state.earningsBtcOfCoin)) {
+      if (getBitcoinValue($row) < config.BALANCE_PRECISION) {
+        $row.addClass("poloniex-ninja-untraded");
+      }
+      return;
+    }
+
+    $row.removeClass("poloniex-ninja-untraded");
+    var btcPrice = getBtcPriceEstimate();
+    var earningsSlsBtc = state.earningsBtcOfCoin[coin];
+    var earningsSlsUsd = earningsSlsBtc * btcPrice;
+
+    var $earningsSlsBtcCell = $row.find("td.earnings_sls_btc");
+    var $earningsSlsUsdCell = $row.find("td.earnings_sls_usd");
+    $earningsSlsBtcCell.html(
+          formatAsChange(earningsSlsBtc, config.COIN_DECIMALS));
+    applyChangeClass($earningsSlsBtcCell, earningsSlsBtc);
+    $earningsSlsUsdCell.html(
+        '$ ' + formatAsChange(earningsSlsUsd, config.USD_DECIMALS));
+    applyChangeClass($earningsSlsUsdCell, earningsSlsUsd);
   });
 }
 
@@ -631,6 +681,8 @@ function computeColumnsFromTradesAsync(callback, forceRecompute) {
       var $row = getCoinRow(targetCoin);
       var currentBalance = getFloatValueFromDom($row.find("td.balance"));
 
+      state.earningsBtcOfCoin[targetCoin] = computeEarningsBtc(history[pair]);
+
       // Skip near zero balance.
       if (currentBalance < config.BALANCE_PRECISION) {
         continue;
@@ -641,7 +693,6 @@ function computeColumnsFromTradesAsync(callback, forceRecompute) {
           computeAvgBuyPrice(history[pair],
                              boundaryTransactions[targetCoin] || [],
                              currentBalance);
-      state.earningsBtcOfCoin[targetCoin] = computeEarningsBtc(history[pair]);
     }
 
     if (callback) {
@@ -653,7 +704,7 @@ function computeColumnsFromTradesAsync(callback, forceRecompute) {
 }
 
 // Adds the extra columns for the current balances.
-function addExtraBalanceTableColumns() {
+function setupExtraBalanceTableColumns() {
   console.info("PoloNinja: Adding extra balance columns.");
 
   state.data = {btcPrice: getBtcPriceEstimate()};
@@ -723,7 +774,9 @@ function addExtraBalanceTableColumns() {
               $filterable.find("td.balance"),
               function($cell) {
                 computeColumnsFromTradesAsync(function() {
-                  updateTradeColumns($cell.closest("tr"));
+                  var $row = $cell.closest("tr");
+                  updateTradeColumns($row);
+                  updateEarningColumns($row);
                 });
               });
 
@@ -734,11 +787,13 @@ function addExtraBalanceTableColumns() {
                 updateChangePercent($cell.closest("tr"));
               });
 
-          // Update USD prices as bitcoin value changes.
+          // Update USD prices and earnings as bitcoin value changes.
           onInitAndChange(
               $filterable.find("td.value"),
               function($cell) {
-                updateUsdBalance($cell.closest("tr"));
+                var $row = $cell.closest("tr");
+                updateUsdBalanceColumn($row);
+                updateEarningColumns($row);
               });
 
           // Update all extra columns as the price changes.
@@ -746,32 +801,62 @@ function addExtraBalanceTableColumns() {
               "#accountValue_btc",
               function() {
                 state.data.btcPrice = getBtcPriceEstimate();
-                updateUsdBalance($("#balancesTable tbody tr.filterable"));
+                updateUsdBalanceColumn($filterable);
                 computeColumnsFromTradesAsync(function() {
-                  updateTradeColumns(
-                      $("#balancesTable tbody tr.filterable"));
+                  updateTradeColumns($filterable);
+                  updateEarningColumns($filterable);
                 });
               });
         }, /*forceRecompute=*/true);  // computeColumnsFromTradesAsync
       });  // onAllComplete
 }
 
+// Adds extra filter options at top of the table.
+function setupExtraFilteringOptions() {
+  console.info("PoloNinja: Adding extra filtering options for rows.");
+  var $utils = $(".utilities:first");
+  var $option = $('<span class="poloniex-ninja-filter-option">' +
+                  '<input type="checkbox" ' +
+                  'id="poloniex-ninja-hide-untraded" value="">' +
+                  '<label for="poloniex-ninja-hide-untraded">' +
+                  'Hide Untraded</label></span>');
+  $utils.append($option);
+  var $hideUntraded = $option.find("#poloniex-ninja-hide-untraded");
+  $hideUntraded.change(function() {
+    var isChecked = $(this).is(":checked");
+    updateSettings(function(settings) {
+      settings.balance_row_filters.hide_untraded = isChecked;
+    });
+  });
+
+  // Listen for changes and sync with filtering context.
+  $(".utilities").on("change", "input[type=checkbox]", function() {
+    applyFilterContext();
+  });
+
+  // Reset filters button should include the extra options as well.
+  $(".resetFilters").click(function() {
+    updateSettings(function(settings) {
+      settings.balance_row_filters.hide_untraded = false;
+    });
+  });
+}
+
 // Program entry point.
 function main() {
   // Match the page and apply a DOM layer.
-  var doAdjustTheme = true;
   if (getPagePath().match(/balances.*/)) {
     loadCachedState(function() {
-      addExtraBalanceTableColumns();
+      setupExtraBalanceTableColumns();
+      setupExtraFilteringOptions();
     });
   } else {
     console.info("PoloNinja: No modifications were done on this page.");
-    doAdjustTheme = false;
+    return;
   }
 
-  if (doAdjustTheme) {
-    adjustTheme();
-  }
+  // Dark/Light adjustments.
+  adjustTheme();
 
   // Load and apply current settings.
   loadSettings(applySettings);
