@@ -704,7 +704,7 @@ function computeColumnsFromTradesAsync(callback, forceRecompute) {
 }
 
 // Adds the extra columns for the current balances.
-function setupExtraBalanceTableColumns() {
+function setupExtraBalanceTableColumns(settings) {
   console.info("PoloNinja: Adding extra balance columns.");
 
   state.data = {btcPrice: getBtcPriceEstimate()};
@@ -728,6 +728,8 @@ function setupExtraBalanceTableColumns() {
     if ('description' in col) {
       $th.attr("data-tooltip", col.description);
     }
+    $th.toggleClass("poloniex-ninja-hidden",
+                    !settings.balance_column_visibility[col.key]);
     $th.insertBefore($lastHeader);
   }
 
@@ -752,8 +754,10 @@ function setupExtraBalanceTableColumns() {
     var $lastColumn = $row.find("td:last");
     for (var i = 0; i < EXTRA_BALANCE_COLUMNS.length; i++) {
       var col = EXTRA_BALANCE_COLUMNS[i];
-      $("<td class='poloniex-ninja " + col.key + "'>n/a</td>")
-          .insertBefore($lastColumn);
+      var $td = $("<td class='poloniex-ninja " + col.key + "'>n/a</td>");
+      $td.toggleClass("poloniex-ninja-hidden",
+                      !settings.balance_column_visibility[col.key]);
+      $td.insertBefore($lastColumn);
     }
   });
 
@@ -763,10 +767,10 @@ function setupExtraBalanceTableColumns() {
       {'onProgressComplete': [onProgressComplete, function() { return {}; }],
        'loadTransactions': [loadTransactions, function() { return {}; }]},
       function() {
-        // Apply current settings.
-        loadSettings(applySettings);
-
         computeColumnsFromTradesAsync(function() {
+          // Apply any changed settings between initial load and data available.
+          loadSettings(applySettings);
+
           var $filterable = $("#balancesTable tbody tr.filterable");
 
           // Update avg buy price, value and earnings as total balance changes.
@@ -812,7 +816,7 @@ function setupExtraBalanceTableColumns() {
 }
 
 // Adds extra filter options at top of the table.
-function setupExtraFilteringOptions() {
+function setupExtraFilteringOptions(settings) {
   console.info("PoloNinja: Adding extra filtering options for rows.");
   var $utils = $(".utilities:first");
   var $option = $('<span class="poloniex-ninja-filter-option">' +
@@ -828,6 +832,8 @@ function setupExtraFilteringOptions() {
       settings.balance_row_filters.hide_untraded = isChecked;
     });
   });
+
+  $hideUntraded.prop("checked", settings.balance_row_filters.hide_untraded);
 
   // Listen for changes and sync with filtering context.
   $(".utilities").on("change", "input[type=checkbox]", function() {
@@ -846,23 +852,21 @@ function setupExtraFilteringOptions() {
 function main() {
   // Match the page and apply a DOM layer.
   if (getPagePath().match(/balances.*/)) {
-    loadCachedState(function() {
-      setupExtraBalanceTableColumns();
-      setupExtraFilteringOptions();
+    loadSettings(function(settings) {
+      loadCachedState(function() {
+        setupExtraBalanceTableColumns(settings);
+        setupExtraFilteringOptions(settings);
+      });
     });
+
+    // Dark/Light adjustments.
+    adjustTheme();
+
+    // Listen for live settings changes.
+    onSettingsChanged(applySettings);
   } else {
     console.info("PoloNinja: No modifications were done on this page.");
-    return;
   }
-
-  // Dark/Light adjustments.
-  adjustTheme();
-
-  // Load and apply current settings.
-  loadSettings(applySettings);
-
-  // Listen for live settings changes.
-  onSettingsChanged(applySettings);
 }
 
 main();
