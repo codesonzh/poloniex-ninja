@@ -195,7 +195,7 @@ function getByPath(path, settings) {
 }
 
 // Creates the context menu with settings and links.
-function createContextMenu(options, parent, settings) {
+function createContextMenu(settings, options, parent) {
   var options = options || CONTEXT_MENU;
   var parent = parent ||
       chrome.contextMenus.create({
@@ -232,7 +232,20 @@ function createContextMenu(options, parent, settings) {
 
     var menuItem = chrome.contextMenus.create(menuItemDescriptor);
     if ("children" in option) {
-      createContextMenu(option.children, menuItem, settings);
+      createContextMenu(settings, option.children, menuItem);
     }
   }
+}
+
+// Completely removes the context menu . Once complete, invokes the callback.
+function removeContextMenu(callback) {
+  chrome.contextMenus.removeAll(callback);
+}
+
+// Removes and creates the context menu anew.
+function recreateContextMenu(settings) {
+  console.info("PoloNinja: Recreating context menu.");
+  removeContextMenu(function() {
+    createContextMenu(settings);
+  });
 }
