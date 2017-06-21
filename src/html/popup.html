@@ -7,6 +7,16 @@
   </head>
   <body style="width: 450px; min-height: 520px; padding: 8px;
                background: url('/img/ninja-faded.png') bottom right no-repeat">
+    <style type="text/css">
+      ul.settings {
+        margin-top: 0.2em;
+      }
+
+      ul.settings li {
+        margin-left: 1em;
+        font-size: 0.9em;
+      }
+    </style>
     <div class="container">
       <uib-tabset active="active">
         <uib-tab index="0" heading="About Poloniex™ Ninja">
@@ -54,8 +64,8 @@
             </div>
             <h3>Settings</h3>
 
-            <strong>Display extra balance columns:</strong><br><br>
-            <ul class="nav nav-pills nav-stacked">
+            <strong>Extra balance columns:</strong><br>
+            <ul class="nav nav-pills nav-stacked settings">
               <li ng-repeat="col in EXTRA_BALANCE_COLUMNS">
                 <label>
                   <input type="checkbox" id="{{col.key}}"
@@ -65,11 +75,23 @@
                 </label>
               </li>
             </ul>
+            <br>
 
-            <hr>
+            <strong>Real time updates:</strong><br>
+            <ul class="nav nav-pills nav-stacked settings">
+              <li>
+                <label>
+                  <input type="checkbox" id="real_time_updates_ticker"
+                         ng-model="settings.real_time_updates.ticker"
+                         ng-change="saveSettings()">
+                  <span>Enable real-time price ticker</span>
+                </label>
+              </li>
+            </ul>
+            <br>
 
-            <strong>Donations:</strong><br><br>
-            <ul class="nav nav-pills nav-stacked">
+            <strong>Donations:</strong><br>
+            <ul class="nav nav-pills nav-stacked settings">
               <li>
                 <label>
                   <input type="checkbox" id="display_withdrawal_donation"

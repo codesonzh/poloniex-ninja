@@ -13,20 +13,29 @@ span.poloniex-ninja-filter-option {
 }
 
 .poloniex-ninja-dark th.poloniex-ninja {
-  background-color: #546362 !important;
+  background-color: #334040 !important;
 }
 
 .poloniex-ninja-dark td.poloniex-ninja {
-  background-color: #2b3737 !important;
+  background-color: #162020 !important;
 }
 
 .poloniex-ninja-dark span.poloniex-ninja-filter-option {
-  background-color: #2b3737 !important;
-  border: 1px solid #546362;
+  background-color: #162020 !important;
+  border: 1px solid #334040;
+}
+
+td.poloniex-ninja small {
+  font-size: 0.8em;
+  color: #CCC;
+}
+
+.poloniex-ninja-dark td.poloniex-ninja small {
+  color: #666;
 }
 
 td.poloniex-ninja.neutral {
-  color: yellow !important;
+  color: #888800 !important;
 }
 
 td.poloniex-ninja.negative {
@@ -35,6 +44,47 @@ td.poloniex-ninja.negative {
 
 td.poloniex-ninja.positive {
   color: green !important;
+}
+
+.poloniex-ninja-dark td.poloniex-ninja.negative {
+  color: #bb0000 !important;
+}
+
+.poloniex-ninja-dark td.poloniex-ninja.positive {
+  color: #008800 !important;
+}
+
+td.poloniex-ninja.bg-neutral {
+  -webkit-transition-duration: 0.1s;
+  -moz-transition-duration: 0.1s;
+  border: 1px dotted transparent;
+  transition-duration: 0.1s;
+}
+
+td.poloniex-ninja.bg-negative {
+  background-color: #f6d4d1 !important;
+  border: 1px solid #c02a1d;
+  -webkit-transition-duration: 0.1s;
+  -moz-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+}
+
+td.poloniex-ninja.bg-positive {
+  background-color: #ceebd3 !important;
+  border: 1px solid #27892f;
+  -webkit-transition-duration: 0.1s;
+  -moz-transition-duration: 0.1s;
+  transition-duration: 0.1s;
+}
+
+.poloniex-ninja-dark td.poloniex-ninja.bg-negative {
+  background-color: #2c1b1a !important;
+  border: 1px solid #821d14;
+}
+
+.poloniex-ninja-dark td.poloniex-ninja.bg-positive {
+  background-color: #15281c !important;
+  border: 1px solid #15531a;
 }
 
 .poloniex-ninja-hidden {
@@ -58,11 +108,19 @@ td.poloniex-ninja.positive {
 }
 
 .poloniex-ninja-stretch-5 {
-  max-width: 990px !important;
+  max-width: 1000px !important;
 }
 
 .poloniex-ninja-stretch-6 {
-  max-width: 1050px !important;
+  max-width: 1070px !important;
+}
+
+.poloniex-ninja-stretch-7 {
+  max-width: 1120px !important;
+}
+
+.poloniex-ninja-stretch-8 {
+  max-width: 1200px !important;
 }
 
 input.poloniex-ninja-donation-amount {

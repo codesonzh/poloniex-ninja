@@ -1,5 +1,7 @@
-// From settings.js import EXTRA_BALANCE_COLUMNS, DONATION_CONFIG, SETTINGS,
+// from settings.js import EXTRA_BALANCE_COLUMNS, DONATION_CONFIG, SETTINGS,
 // loadSettings, saveSettings, onSettingsChanged.
+// from websocket.js import WS.setupWebSocket.
+
 (function() {
 
 // TODO: Consider using config from Chrome sync storage.
@@ -11,28 +13,42 @@ var config = {
   // Number of rounding decimals for crypto currency display.
   'COIN_DECIMALS': 8,
   // Precision for values: everything below is considered 0.
-  'BALANCE_PRECISION': 1e-7,
+  'VALUE_PRECISION': 1e-8,
   // Period for XHR requests to sync with latest history.
   'HISTORY_UPDATE_INTERVAL_MS': 120000,
+  // Maximum time between ticker request (cache time of XHR ticker).
+  'TICKER_UPDATE_INTERVAL_MS': 60000,
   // Minimum period for writing to Chrome storage.
   'STORAGE_WRITE_INTERVAL_MS': 10000,
   // Maximum time to wait for the progress bar to start filling up.
   'PROGRESS_MAX_WAIT_MS': 60000,
   // Period for checking the progress bar status.
-  'PROGRESS_CHECK_PERIOD_MS': 10
+  'PROGRESS_CHECK_PERIOD_MS': 50,
+  // Maximum period for updating the ticker.
+  'RENDER_PRICE_UPDATE_PERIOD_MS': 500
 }
 
 // The current state.
 var state = {
- 'data': null,
  'history': null,
  'depositsAndWithdrawals': null,
+ 'tickerData': null,
  'avgBuyPriceOfCoin': null,
  'earningsBtcOfCoin': null,
  'lastStorageWrite': 0,
  'lastHistoryUpdate': 0,
- 'lastDepositsAndWithdrawalsUpdate': 0
+ 'lastTickerUpdate': 0,
+ 'lastDepositsAndWithdrawalsUpdate': 0,
+ 'priceOfCoin': {},
+ 'renderPriceInterval': null
 };
+
+// State variables which can be cached between page reloads.
+var CACHE_STATE_VARS = [
+  'history', 'depositsAndWithdrawals', 'avgBuyPriceOfCoin', 'earningsBtcOfCoin',
+  'lastStorageWrite', 'lastHistoryUpdate', 'lastDepositsAndWithdrawalsUpdate',
+  'priceOfCoin'
+];
 
 // Asnychronous version of the each method to keep responsiveness.
 $.fn.extend({
@@ -84,13 +100,15 @@ function onInitAndChange(query, callback) {
   });
 }
 
-// Returns a numeric value from inner HTML or null if not available.
-function getFloatValueFromDom(query) {
+// Returns a numeric value from inner HTML (or from an attribute when provided)
+// or null if not available.
+function getFloatValueFromDom(query, attr) {
   if ($(query).length == 0)
     return null;
 
-  var value = parseFloat($(query).text());
-  if (value != NaN && value != Infinity) {
+  var domValue = attr ? $(query).attr(attr) : $(query).text();
+  var value = parseFloat(domValue);
+  if (!isNaN(value) && value != Infinity) {
     return value;
   }
 
@@ -102,24 +120,36 @@ function formatAsChange(value, decimals) {
   return (value > 0 ? "+" : "") + value.toFixed(decimals);
 }
 
+// Returns a USD formatted string from float value.
+function formatUsd(value) {
+  return "$ " + value.toFixed(config.USD_DECIMALS);
+}
+
+// Returns an altcoin formatted string from float value.
+function formatCoin(value) {
+  return value.toFixed(config.COIN_DECIMALS);
+}
+
 // Returns the class of the change.
-function getChangeClass(value) {
-  if (Math.abs(value) < config.BALANCE_PRECISION) {
-    return "neutral";
+function getChangeClass(value, prefix) {
+  var prefix = prefix || "";
+  if (Math.abs(value) < config.VALUE_PRECISION) {
+    return prefix + "neutral";
   } else if (value < 0) {
-    return "negative";
+    return prefix + "negative";
   } else {
-    return "positive";
+    return prefix + "positive";
   }
 }
 
 // Applies the colorized css class to a cell based on it's value.
-function applyChangeClass($cell, value) {
+function applyChangeClass($cell, value, prefix) {
+  var prefix = prefix || "";
   $cell
-      .removeClass("neutral")
-      .removeClass("positive")
-      .removeClass("negative")
-      .addClass(getChangeClass(value));
+      .removeClass(prefix + "neutral")
+      .removeClass(prefix + "positive")
+      .removeClass(prefix + "negative")
+      .addClass(getChangeClass(value, prefix));
 }
 
 // Computes the growth rate in percentages comparing an old and new value.
@@ -132,6 +162,7 @@ function applySettings(settings) {
   setColumnVisibility(settings.balance_column_visibility);
   setDonationInfoVisibility(settings.display_withdrawal_donation);
   setUntradedRowVisibility(!settings.balance_row_filters.hide_untraded);
+  setTickerEnabled(settings.real_time_updates.ticker);
   applyFilterContext();
 }
 
@@ -183,7 +214,15 @@ function saveCachedState(callback) {
   if ((getTimestamp() - state.lastStorageWrite) >
       config.STORAGE_WRITE_INTERVAL_MS) {
     state.lastStorageWrite = getTimestamp();
-    chrome.storage.local.set({'state': state}, function() {
+    // Scoop up only cacheable vars from state.
+    var cachedState = {};
+    for (var i = 0; i < CACHE_STATE_VARS; i++) {
+      var field = CACHE_STATE_VARS[i];
+      if (field in state) {
+        cachedState[field] = state;
+      }
+    }
+    chrome.storage.local.set({'state': cachedState}, function() {
       if (callback) {
         callback(state);
       }
@@ -196,6 +235,50 @@ function adjustTheme() {
   if ($("link[href*='dark']").length > 0) {
     $("body").addClass("poloniex-ninja-dark");
   }
+}
+
+// Enables or disables the ticker.
+function setTickerEnabled(enabled) {
+  if (enabled) {
+    WS.setupWebsocket({
+      'ticker': function(tickerUpdate) {
+        updateLastPrice(tickerUpdate.pair, parseFloat(tickerUpdate.last));
+      }
+    });
+  } else {
+    WS.teardownWebsocket();
+  }
+
+  // Start/stop the interval for a more seamless experience.
+  setPriceUpdateRenderingEnabled(enabled);
+}
+
+// Sets up an interval to periodically update the current prices.
+function setPriceUpdateRenderingEnabled(enabled) {
+  if (enabled) {
+    if (state.renderPriceInterval) {
+      return;
+    }
+    console.info("PoloNinja: Enabling ticker rendering.");
+    state.renderPriceInterval = setInterval(function() {
+      updateAllTickerPrices();
+    }, config.RENDER_PRICE_UPDATE_PERIOD_MS);
+  } else {
+    if (state.renderPriceInterval) {
+      console.info("PoloNinja: Disabling ticker rendering.");
+      clearInterval(state.renderPriceInterval);
+      state.renderPriceInterval = null;
+      applyChangeClass($("tr.filterable td[data-last-updated]"), 0.0, "bg-");
+    }
+  }
+}
+
+// Renders initial ticker data and binds to the websocket for real-time updates.
+function setupTicker(settings, tickerData) {
+  // Apply initial ticker data.
+  initializeTicker(tickerData);
+  // Listen for ticker changes on WebSocket.
+  setTickerEnabled(settings.real_time_updates.ticker);
 }
 
 // Updates column visibility from the settings object and adjusts the table
@@ -295,7 +378,7 @@ function attachDonationInfo($actionRow) {
 
   var donation = DONATION_CONFIG[currency];
   var fee = getFloatValueFromDom($withdrawDiv.find("#withdrawalTxFee"));
-  var amount = (donation.amount - fee).toFixed(config.COIN_DECIMALS);
+  var amount = formatCoin(donation.amount - fee);
   $withdrawDiv.append($('<hr class="seperator poloniex-ninja-donation">'));
   $withdrawDiv.append($donationRow);
   $donationRow.find(".poloniex-ninja-donation-amount").val(amount);
@@ -366,6 +449,23 @@ function loadDepositsAndWithdrawalsHistory(callback) {
   }
 }
 
+// Loads the current ticker data for each currency.
+function loadTickerData(callback) {
+  if ((getTimestamp() - state.lastTickerUpdate) >
+      config.TICKER_UPDATE_INTERVAL_MS) {
+    $.getJSON(
+      "/public.php?command=returnTicker",
+      function(tickerData) {
+        state.tickerData = tickerData;
+        state.lastTickerUpdate = getTimestamp();
+        callback(tickerData, /*cached=*/false);
+      });
+  } else {
+    // Provide cached results.
+    callback(state.tickerData, /*cached=*/true);
+  }
+}
+
 // Loads all transactions (trade history and deposits & withdrawals).
 function loadTransactions(callback) {
   onAllComplete({
@@ -417,13 +517,21 @@ function getBitcoinValue($row) {
 
 // Gets the estimated value of BTC in USD or 0 if not available.
 function getBtcPriceEstimate() {
- var usdHoldings = getUsdHoldings();
- if (usdHoldings == null)
-   return 0.0;
+  // Attempt getting the freshest price from ticker.
+  var btcPrice = getFloatValueFromDom(
+    "#balancesTable tr[data-url=BTC] > td.last_usdt_price:first",
+    "data-last-value");
 
- var btcHoldings = getBtcHoldings();
- if (btcHoldings == null || btcHoldings == 0.0)
-   return 0.0;
+  if (btcPrice != null)
+    return btcPrice;
+
+  var usdHoldings = getUsdHoldings();
+  if (usdHoldings == null || usdHoldings == 0.0)
+    return 0.0;
+
+  var btcHoldings = getBtcHoldings();
+  if (btcHoldings == null || btcHoldings == 0.0)
+    return 0.0;
 
   return usdHoldings / btcHoldings;
 }
@@ -461,11 +569,70 @@ function getTradeSummaryForRow($row, callback) {
   });
 }
 
+// Updates all coin prices from available ticker data.
+function updateAllTickerPrices() {
+  $("tr.filterable[data-url!='']:visible").eachAsync(function() {
+    var $row = $(this);
+    var targetCoin = getRowCoin($row);
+
+    if (!(targetCoin in state.priceOfCoin)) {
+      return;
+    }
+
+    var prices = state.priceOfCoin[targetCoin];
+    for (var baseCoin in prices) {
+      var $priceCell =
+          $row.find("td.last_" + baseCoin.toLowerCase() + "_price:first");
+
+      if ($priceCell.length == 0)
+        continue;
+
+      updateCellWithGrowthIndicator(
+          $priceCell, prices[baseCoin], /*isUsd=*/baseCoin=='USDT');
+    }
+  });
+}
+
+// Updates the currency pair last price in the table.
+function updateLastPrice(pair, lastPrice) {
+  var parts = pair.split('_');
+  var baseCoin = parts[0];
+  var targetCoin = parts[1];
+
+
+  if (!(targetCoin in state.priceOfCoin))
+    state.priceOfCoin[targetCoin] = {};
+
+  state.priceOfCoin[targetCoin][baseCoin] = lastPrice;
+}
+
+// Updates value of cell and marks it with a growth indicator class which
+// automatically fades after some short time.
+function updateCellWithGrowthIndicator($cell, newValue, isUsd) {
+  // Compute the diff and render the value.
+  var displayPrice = isUsd ? formatUsd(newValue) : formatCoin(newValue);
+  // Don't indicate change when initializing (diff = 0.0).
+  var oldValue = $cell.attr("data-last-value") || newValue;
+  $cell.attr("data-last-updated", getTimestamp());
+  $cell.attr("data-last-value", newValue);
+  $cell.html(displayPrice);
+  var diff = newValue - oldValue;
+  applyChangeClass($cell, diff, "bg-");
+
+  // Neutralize the display class of cell after default timeout.
+  if (diff >= config.VALUE_PRECISION) {
+    var neutralTimeout = 1000;
+    setTimeout(function() {
+      if ((getTimestamp() - parseFloat($cell.attr("data-last-updated"))) >
+          neutralTimeout) {
+        applyChangeClass($cell, 0.0, "bg-");
+      }
+    }, neutralTimeout * 2);
+  }
+}
+
 // Updates USD balance on each row.
 function updateUsdBalanceColumn($rowQuery) {
-  if (!state.data)
-    return;
-
   $rowQuery.eachAsync(function() {
     var $row = $(this);
     var bitcoinValue = getBitcoinValue($row);
@@ -473,10 +640,10 @@ function updateUsdBalanceColumn($rowQuery) {
     if (bitcoinValue == null)
       return;
 
-    var usdValue =
-        (bitcoinValue * state.data.btcPrice).toFixed(config.USD_DECIMALS);
+    var usdValue = bitcoinValue * getBtcPriceEstimate();
 
-    $row.find(".usd_value:first").html("$ " + usdValue);
+    updateCellWithGrowthIndicator(
+        $row.find(".usd_value:first"), usdValue, /*isUsd=*/true);
   });
 }
 
@@ -488,10 +655,8 @@ function updateTradeColumns($rowQuery) {
     getTradeSummaryForRow($row, function(r) {
       var $avgBuyPriceCell = $row.find("td.avg_buy_price");
       var $avgBuyValueCell = $row.find("td.avg_buy_value");
-      $avgBuyPriceCell.html(
-          r.avgBuyPrice.toFixed(config.COIN_DECIMALS));
-      $avgBuyValueCell.html(
-          r.avgBuyValue.toFixed(config.COIN_DECIMALS));
+      $avgBuyPriceCell.html(formatCoin(r.avgBuyPrice));
+      $avgBuyValueCell.html(formatCoin(r.avgBuyValue));
     });
   });
 }
@@ -509,7 +674,7 @@ function updateEarningColumns($rowQuery) {
         return;
 
     if (!(coin in state.earningsBtcOfCoin)) {
-      if (getBitcoinValue($row) < config.BALANCE_PRECISION) {
+      if (getBitcoinValue($row) < config.VALUE_PRECISION) {
         $row.addClass("poloniex-ninja-untraded");
       }
       return;
@@ -574,7 +739,7 @@ function computeAvgBuyPrice(transactions, boundaryTransactions,
       totalBuyAmount += netAmount;
     }
 
-    if (balance < config.BALANCE_PRECISION)  {
+    if (balance < config.VALUE_PRECISION)  {
       computed = true;
       break;
     }
@@ -684,7 +849,7 @@ function computeColumnsFromTradesAsync(callback, forceRecompute) {
       state.earningsBtcOfCoin[targetCoin] = computeEarningsBtc(history[pair]);
 
       // Skip near zero balance.
-      if (currentBalance < config.BALANCE_PRECISION) {
+      if (currentBalance < config.VALUE_PRECISION) {
         continue;
       }
 
@@ -706,8 +871,6 @@ function computeColumnsFromTradesAsync(callback, forceRecompute) {
 // Adds the extra columns for the current balances.
 function setupExtraBalanceTableColumns(settings) {
   console.info("PoloNinja: Adding extra balance columns.");
-
-  state.data = {btcPrice: getBtcPriceEstimate()};
 
   // Fix the dynamic rows on deposit/withdraw and add donation elements.
   $("#balancesTable tbody").on("DOMNodeInserted", "tr", function(e) {
@@ -754,10 +917,12 @@ function setupExtraBalanceTableColumns(settings) {
     var $lastColumn = $row.find("td:last");
     for (var i = 0; i < EXTRA_BALANCE_COLUMNS.length; i++) {
       var col = EXTRA_BALANCE_COLUMNS[i];
-      var $td = $("<td class='poloniex-ninja " + col.key + "'>n/a</td>");
+      var $td = $("<td class='poloniex-ninja " + col.key +
+                  "' nowrap><small>n/a</small></td>");
       $td.toggleClass("poloniex-ninja-hidden",
                       !settings.balance_column_visibility[col.key]);
       $td.insertBefore($lastColumn);
+      $td.addClass(col.class);
     }
   });
 
@@ -765,8 +930,12 @@ function setupExtraBalanceTableColumns(settings) {
   // transaction history cached, fill out the columns and bind events.
   onAllComplete(
       {'onProgressComplete': [onProgressComplete, function() { return {}; }],
-       'loadTransactions': [loadTransactions, function() { return {}; }]},
-      function() {
+       'loadTransactions': [loadTransactions, function() { return {}; }],
+       'loadTickerData': [loadTickerData, function(tdata) { return tdata; }]},
+      function(tickerData) {
+        // Listen for ticker updates.
+        setupTicker(settings, tickerData);
+
         computeColumnsFromTradesAsync(function() {
           // Apply any changed settings between initial load and data available.
           loadSettings(applySettings);
@@ -800,17 +969,19 @@ function setupExtraBalanceTableColumns(settings) {
                 updateEarningColumns($row);
               });
 
+          var updateAll = function() {
+            updateUsdBalanceColumn($filterable);
+            computeColumnsFromTradesAsync(function() {
+              updateTradeColumns($filterable);
+              updateEarningColumns($filterable);
+            });
+          }
+
           // Update all extra columns as the price changes.
           onInitAndChange(
-              "#accountValue_btc",
-              function() {
-                state.data.btcPrice = getBtcPriceEstimate();
-                updateUsdBalanceColumn($filterable);
-                computeColumnsFromTradesAsync(function() {
-                  updateTradeColumns($filterable);
-                  updateEarningColumns($filterable);
-                });
-              });
+              "#accountValue_btc, " +
+              "#balancesTable tr[data-url=BTC] > td.last_usdt_price:first",
+              updateAll);
         }, /*forceRecompute=*/true);  // computeColumnsFromTradesAsync
       });  // onAllComplete
 }
@@ -846,6 +1017,18 @@ function setupExtraFilteringOptions(settings) {
       settings.balance_row_filters.hide_untraded = false;
     });
   });
+}
+
+// Sets the last prices for each currency from all available ticker data.
+function initializeTicker(tickerData) {
+  for (var pair in tickerData) {
+    try {
+      updateLastPrice(pair, parseFloat(tickerData[pair].last));
+    } catch (ex) {
+      console.warn("PoloNinja: Failed initializing ticker.");
+    }
+  }
+  updateAllTickerPrices();
 }
 
 // Program entry point.

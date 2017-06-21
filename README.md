@@ -28,10 +28,16 @@ Thanks for supporting development of Poloniex™ Ninja!
 
 ## Features
 
-**The tool is being developed. Balance extensions are currently supported.**
+* Extra balance columns for better stats and tracking
+* Real-time ticker of current prices and holdings
+* Filtering of untraded coins (e.g. to see earnings for sold out coins)
+* Easy settings via Chrome toolbox or right-click context menu
+* Inline donation info at withdrawal form (accepting various coins)
 
-The added balance columns are as follows:
+The extra balance columns are as follows:
 
+* **BTC Price** - The last market price of the coin in BTC
+* **USDT Price** - The last market price of the coin in USDT
 * **AVG Buy Price** - the average weighted buy price which justifies the current
   balance of the coin; we consider the transaction history backwards up to the
   point where the net balance was 0 (including deposits and withdrawals) - this
@@ -66,7 +72,7 @@ All computation is done on the client, however some data may be requested using
 the fetch or XHR API exclusively from the Poloniex™ server (only GET requests)
 in order to provide more context and to be up to date.
 
-The extension is only requesting access to [www.]poloniex.com and no other
+The extension is only requesting access to [www.|api2.]poloniex.com and no other
 origins, hence no data is being collected and the program only operates in the
 browser. An additional storage permission is requested to be able to persist the
 user settings for the extension (Chrome sync mechanism). This does not interfere

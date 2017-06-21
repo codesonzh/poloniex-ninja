@@ -1,34 +1,52 @@
 // The extra column descriptors.
 var EXTRA_BALANCE_COLUMNS = [
+  {'key': 'last_btc_price',
+   'title': 'BTC Price',
+   'setting': 'Last price (BTC)',
+   'description': 'Last price of the coin in BTC (real-time sync)',
+   'class': 'bg-neutral',
+   'default_visibility': true},
+  {'key': 'last_usdt_price',
+   'title': 'USDT Price',
+   'setting': 'Last price (USDT)',
+   'description': 'Last price of the coin in USDT (real-time sync)',
+   'class': 'bg-neutral',
+   'default_visibility': true},
   {'key': 'avg_buy_price',
    'title': 'AVG Buy Price',
    'setting': 'AVG Buy Price',
    'description': 'Average buy price of the coin based on your trades',
+   'class': '',
    'default_visibility': true},
   {'key': 'avg_buy_value',
    'title': 'EST Buy Value',
    'setting': 'EST Buy Value',
    'description': 'Estimated coin value at the average buy price',
+   'class': '',
    'default_visibility': true},
   {'key': 'change_percent',
    'title': 'Change',
    'setting': 'Change since bought',
    'description': 'Growth rate (change since bought)',
+   'class': '',
    'default_visibility': true},
   {'key': 'usd_value',
    'title': 'USD Value',
    'setting': 'USD Value',
    'description': 'Estimated USD value of your coin holdings',
+   'class': 'bg-neutral',
    'default_visibility': true},
   {'key': 'earnings_sls_btc',
    'title': 'Earnings *',
    'setting': 'Total earnings at last sale (BTC)',
    'description': 'Total estimated earnings in BTC (last purchases excluded)',
+   'class': '',
    'default_visibility': true},
   {'key': 'earnings_sls_usd',
    'title': 'USD Earn. *',
    'setting': 'Total earnings at last sale (USD)',
    'description': 'Total estimated earnings in USD (last purchases excluded)',
+   'class': '',
    'default_visibility': true},
 ];
 
@@ -62,6 +80,9 @@ var DEFAULT_SETTINGS = {
   'display_withdrawal_donation': true,
   'balance_row_filters': {
     'hide_untraded': false
+  },
+  'real_time_updates': {
+    'ticker': true
   }
 };
 
@@ -77,6 +98,10 @@ var CONTEXT_MENU = [
                     'title': col.title,
                     'path': 'balance_column_visibility.' + col.key}
           })},
+  {'type': 'checkbox',
+   'key': 'real_time_ticker',
+   'title': 'Real-time ticker',
+   'path': 'real_time_updates.ticker'},
   {'type': 'separator'},
   {'type': 'normal',
    'key': 'donate',
