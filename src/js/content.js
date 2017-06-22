@@ -13,7 +13,7 @@ var config = {
   // Number of rounding decimals for crypto currency display.
   'COIN_DECIMALS': 8,
   // Precision for values: everything below is considered 0.
-  'VALUE_PRECISION': 1e-8,
+  'VALUE_PRECISION': 1e-7,
   // Period for XHR requests to sync with latest history.
   'HISTORY_UPDATE_INTERVAL_MS': 120000,
   // Maximum time between ticker request (cache time of XHR ticker).
