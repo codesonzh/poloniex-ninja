@@ -117,6 +117,9 @@ function getFloatValueFromDom(query, attr) {
 
 // Formats a value displayed as change with fixed number of decimals and sign.
 function formatAsChange(value, decimals) {
+  if (isNaN(value) || value == Infinity)
+    return "n/a";
+
   return (value > 0 ? "+" : "") + value.toFixed(decimals);
 }
 
@@ -132,6 +135,9 @@ function formatCoin(value) {
 
 // Returns the class of the change.
 function getChangeClass(value, prefix) {
+  if (isNaN(value) || value == Infinity)
+    return "";
+
   var prefix = prefix || "";
   if (Math.abs(value) < config.VALUE_PRECISION) {
     return prefix + "neutral";
@@ -153,6 +159,7 @@ function applyChangeClass($cell, value, prefix) {
 }
 
 // Computes the growth rate in percentages comparing an old and new value.
+// This method may return Infinity if oldValue is 0.
 function computeGrowthRate(oldValue, newValue) {
   return (newValue - oldValue) * 100.0 / oldValue;
 }
