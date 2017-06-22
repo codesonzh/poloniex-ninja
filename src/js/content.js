@@ -268,16 +268,26 @@ function setPriceUpdateRenderingEnabled(enabled) {
     }
     console.info("PoloNinja: Enabling ticker rendering.");
     state.renderPriceInterval = setInterval(function() {
-      updateAllTickerPrices();
+      if (state.renderPriceInterval != null) {
+        updateAllTickerPrices();
+      } else {
+        console.log("PoloNinja: Clearing ticker growth indicators.");
+        clearTickerGrowthIndicators();
+      }
     }, config.RENDER_PRICE_UPDATE_PERIOD_MS);
   } else {
     if (state.renderPriceInterval) {
       console.info("PoloNinja: Disabling ticker rendering.");
       clearInterval(state.renderPriceInterval);
       state.renderPriceInterval = null;
-      applyChangeClass($("tr.filterable td[data-last-updated]"), 0.0, "bg-");
+      clearTickerGrowthIndicators();
     }
   }
+}
+
+// Removes the style of all ticker growth indicators.
+function clearTickerGrowthIndicators() {
+  applyChangeClass($("tr.filterable td[data-last-updated]"), 0.0, "bg-");
 }
 
 // Renders initial ticker data and binds to the websocket for real-time updates.
