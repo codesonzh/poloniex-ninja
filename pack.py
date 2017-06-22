@@ -4,6 +4,19 @@ import os
 import zipfile
 import json
 from collections import OrderedDict
+import subprocess
+
+def check_git_tree_clean():
+  changed = subprocess.call("git diff --exit-code")
+  if changed != 0:
+    subprocess.call("git status")
+    raise Exception("Git tree is not clean. Commit changes before packing.")
+
+
+def commit_and_tag(version):
+  subprocess.call("git commit --amend --no-edit")
+  subprocess.call("git tag -a \"v%s\" -m \"Package release\"" % version)
+
 
 def make_zipfile(output_filename, source_dir):
   relroot = os.path.abspath(source_dir)
@@ -42,8 +55,11 @@ def upgrade_version(manifest_path):
   return version
 
 if __name__ == '__main__':
+  # Prevent packing if changes were not commited.
+  check_git_tree_clean()
   new_version = upgrade_version("src/manifest.json")
   filename = 'dist/poloniex-ninja-%s.zip' % new_version
   if os.path.exists(filename):
     os.remove(filename)
   make_zipfile(filename, "src")
+  commit_and_tag(new_version)
