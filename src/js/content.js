@@ -271,7 +271,7 @@ function setPriceUpdateRenderingEnabled(enabled) {
       if (state.renderPriceInterval != null) {
         updateAllTickerPrices();
       } else {
-        console.log("PoloNinja: Clearing ticker growth indicators.");
+        console.info("PoloNinja: Clearing ticker growth indicators.");
         clearTickerGrowthIndicators();
       }
     }, config.RENDER_PRICE_UPDATE_PERIOD_MS);
@@ -732,7 +732,6 @@ function computeAvgBuyPrice(transactions, boundaryTransactions,
   var balance = currentBalance;
   var rates = [];
   var totalBuyAmount = 0.0;
-  var computed = false;
 
   // Subtract all deposits and withdrawals from current balance. This will
   // account for the part of the current balance. Notice that withdrawals are
@@ -757,14 +756,14 @@ function computeAvgBuyPrice(transactions, boundaryTransactions,
     }
 
     if (balance < config.VALUE_PRECISION)  {
-      computed = true;
       break;
     }
   }
 
   // Failed accoutning for the balance, may be mixture of other currencies.
-  if (!computed)
+  if (totalBuyAmount < config.VALUE_PRECISION)  {
     return null;
+  }
 
   // Compute the average buy price.
   var avgBuyPrice = 0.0;
