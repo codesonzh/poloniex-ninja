@@ -82,7 +82,8 @@ var DEFAULT_SETTINGS = {
     'hide_untraded': false
   },
   'real_time_updates': {
-    'ticker': true
+    'ticker': true,
+    'btc_value': true
   }
 };
 
@@ -98,10 +99,18 @@ var CONTEXT_MENU = [
                     'title': col.title,
                     'path': 'balance_column_visibility.' + col.key}
           })},
-  {'type': 'checkbox',
-   'key': 'real_time_ticker',
-   'title': 'Real-time ticker',
-   'path': 'real_time_updates.ticker'},
+  {'type': 'normal',
+   'key': 'real_time',
+   'title': 'Real-time updates',
+   'children': [
+     {'type': 'checkbox',
+      'key': 'real_time_ticker',
+      'title': 'Ticker',
+      'path': 'real_time_updates.ticker'},
+     {'type': 'checkbox',
+      'key': 'real_time_btc_value',
+      'title': 'BTC value (experimental)',
+      'path': 'real_time_updates.btc_value'}]},
   {'type': 'separator'},
   {'type': 'normal',
    'key': 'donate',

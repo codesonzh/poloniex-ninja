@@ -87,6 +87,14 @@
                   <span>Enable real-time price ticker</span>
                 </label>
               </li>
+              <li>
+                <label>
+                  <input type="checkbox" id="real_time_updates_btc_value"
+                         ng-model="settings.real_time_updates.btc_value"
+                         ng-change="saveSettings()">
+                  <span>Enable real-time BTC value (experimental)</span>
+                </label>
+              </li>
             </ul>
             <br>
 

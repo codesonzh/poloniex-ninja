@@ -40,7 +40,8 @@ var state = {
  'lastTickerUpdate': 0,
  'lastDepositsAndWithdrawalsUpdate': 0,
  'priceOfCoin': {},
- 'renderPriceInterval': null
+ 'renderPriceInterval': null,
+ 'nativeBtcValueUpdateEnabled': false,
 };
 
 // State variables which can be cached between page reloads.
@@ -133,6 +134,11 @@ function formatCoin(value) {
   return value.toFixed(config.COIN_DECIMALS);
 }
 
+// Returns a formatted string of a percentage value.
+function formatPercent(value) {
+  return formatAsChange(value, config.CHANGE_PERCENT_DECIMALS);
+}
+
 // Returns the class of the change.
 function getChangeClass(value, prefix) {
   if (isNaN(value) || value == Infinity)
@@ -170,6 +176,7 @@ function applySettings(settings) {
   setDonationInfoVisibility(settings.display_withdrawal_donation);
   setUntradedRowVisibility(!settings.balance_row_filters.hide_untraded);
   setTickerEnabled(settings.real_time_updates.ticker);
+  setNativeBtcValueUpdateEnabled(settings.real_time_updates.btc_value);
   applyFilterContext();
 }
 
@@ -285,6 +292,27 @@ function setPriceUpdateRenderingEnabled(enabled) {
   }
 }
 
+// Set the current enabled state of the native BTC value column updates.
+function setNativeBtcValueUpdateEnabled(enabled) {
+  if (enabled === state.nativeBtcValueUpdateEnabled) {
+    return;
+  }
+
+  var $btcValueColumn = $("tr.filterable td.value, th:contains('BTC Value')");
+
+  if (enabled) {
+    console.info(
+        "PoloNinja: Enabling experimental real-time BTC value updates.");
+    $btcValueColumn.addClass("poloniex-ninja");
+  } else {
+    console.info(
+        "PoloNinja: Disabling experimental real-time BTC value updates.");
+    applyChangeClass($("td.change_percent, td.value"), 0.0, "bg-");
+    $btcValueColumn.removeClass("poloniex-ninja");
+  }
+  state.nativeBtcValueUpdateEnabled = enabled;
+}
+
 // Removes the style of all ticker growth indicators.
 function clearTickerGrowthIndicators() {
   applyChangeClass($("tr.filterable td[data-last-updated]"), 0.0, "bg-");
@@ -296,6 +324,8 @@ function setupTicker(settings, tickerData) {
   initializeTicker(tickerData);
   // Listen for ticker changes on WebSocket.
   setTickerEnabled(settings.real_time_updates.ticker);
+  // Also set up the native btc value updates.
+  setNativeBtcValueUpdateEnabled(settings.real_time_updates.btc_value);
 }
 
 // Updates column visibility from the settings object and adjusts the table
@@ -605,7 +635,9 @@ function updateAllTickerPrices() {
         continue;
 
       updateCellWithGrowthIndicator(
-          $priceCell, prices[baseCoin], /*isUsd=*/baseCoin=='USDT');
+          $priceCell,
+          prices[baseCoin],
+          baseCoin == 'USDT' ? formatUsd : formatCoin);
     }
   });
 }
@@ -616,7 +648,6 @@ function updateLastPrice(pair, lastPrice) {
   var baseCoin = parts[0];
   var targetCoin = parts[1];
 
-
   if (!(targetCoin in state.priceOfCoin))
     state.priceOfCoin[targetCoin] = {};
 
@@ -625,27 +656,39 @@ function updateLastPrice(pair, lastPrice) {
 
 // Updates value of cell and marks it with a growth indicator class which
 // automatically fades after some short time.
-function updateCellWithGrowthIndicator($cell, newValue, isUsd) {
+function updateCellWithGrowthIndicator($cell, newValue, formatFunc) {
   // Compute the diff and render the value.
-  var displayPrice = isUsd ? formatUsd(newValue) : formatCoin(newValue);
-  // Don't indicate change when initializing (diff = 0.0).
-  var oldValue = $cell.attr("data-last-value") || newValue;
+  var formatFunc = formatFunc || formatCoin;
+  var displayValue = formatFunc(newValue);
+  var oldValue = getFloatValueFromDom($cell, "data-last-value") || newValue;
+  var lastUpdate = $cell.attr("data-last-updated");
+  var diff = newValue - oldValue;
+  var neutralTimeout = 1000;
+
+  // Cancel update if no diff and not enough time has passed to indicate change.
+  if (lastUpdate && (getTimestamp() - lastUpdate) < neutralTimeout &&
+      diff < config.VALUE_PRECISION) {
+    return;
+  }
+
+  $cell.html(displayValue);
   $cell.attr("data-last-updated", getTimestamp());
   $cell.attr("data-last-value", newValue);
-  $cell.html(displayPrice);
-  var diff = newValue - oldValue;
+
+  // Don't indicate change when initializing (diff = 0.0).
+  var initializing = !$cell.attr("data-last-value");
+  if (diff < config.VALUE_PRECISION && initializing) {
+    return;
+  }
+
   applyChangeClass($cell, diff, "bg-");
 
-  // Neutralize the display class of cell after default timeout.
-  if (diff >= config.VALUE_PRECISION) {
-    var neutralTimeout = 1000;
-    setTimeout(function() {
-      if ((getTimestamp() - parseFloat($cell.attr("data-last-updated"))) >
-          neutralTimeout) {
-        applyChangeClass($cell, 0.0, "bg-");
-      }
-    }, neutralTimeout * 2);
-  }
+  setTimeout(function() {
+    if ((getTimestamp() - parseFloat($cell.attr("data-last-updated"))) >
+        neutralTimeout) {
+      applyChangeClass($cell, 0.0, "bg-");
+    }
+  }, neutralTimeout * 2);
 }
 
 // Updates USD balance on each row.
@@ -660,7 +703,7 @@ function updateUsdBalanceColumn($rowQuery) {
     var usdValue = bitcoinValue * getBtcPriceEstimate();
 
     updateCellWithGrowthIndicator(
-        $row.find(".usd_value:first"), usdValue, /*isUsd=*/true);
+        $row.find(".usd_value:first"), usdValue, formatUsd);
   });
 }
 
@@ -713,15 +756,40 @@ function updateEarningColumns($rowQuery) {
   });
 }
 
+// Updates the native BTC value column as the BTC price changes.
+function updateNativeBtcValue($rowQuery) {
+  // Still an experimental feature.
+  if (!state.nativeBtcValueUpdateEnabled) {
+    return;
+  }
+
+  $rowQuery.eachAsync(function() {
+    var $row = $(this);
+    var btcPrice = getFloatValueFromDom($row.find("td.last_btc_price"));
+    if (btcPrice == null)
+      return;
+
+    var balance = getFloatValueFromDom($row.find("td.balance"));
+    if (balance == null || balance < config.VALUE_PRECISION)
+      return;
+
+    var $btcValueCell = $row.find("td.value");
+    var oldValue = getFloatValueFromDom($btcValueCell);
+    var btcValue = btcPrice * balance;
+    updateCellWithGrowthIndicator($btcValueCell, btcValue, formatCoin);
+  });
+}
+
 // Updates the change column in one or more rows.
 function updateChangePercent($rowQuery) {
   $rowQuery.eachAsync(function() {
     var $row = $(this);
     getTradeSummaryForRow($row, function(r) {
       var $changePercentCell = $row.find("td.change_percent");
-      $changePercentCell.html(formatAsChange(r.changePercent,
-                                             config.CHANGE_PERCENT_DECIMALS));
       applyChangeClass($changePercentCell, r.changePercent);
+      updateCellWithGrowthIndicator($changePercentCell,
+                                    r.changePercent,
+                                    formatPercent);
     });
   });
 }
@@ -969,6 +1037,13 @@ function setupExtraBalanceTableColumns(settings) {
                 });
               });
 
+          // Update the BTC value native column as price changes.
+          onInitAndChange(
+            $filterable.find("td.last_btc_price"),
+            function($cell) {
+              updateNativeBtcValue($cell.closest("tr"));
+            });
+
           // Update the change column as avg buy value or btc value changes.
           onInitAndChange(
               $filterable.find("td.value, td.avg_buy_value, td.avg_buy_price"),
@@ -990,6 +1065,7 @@ function setupExtraBalanceTableColumns(settings) {
             computeColumnsFromTradesAsync(function() {
               updateTradeColumns($filterable);
               updateEarningColumns($filterable);
+              updateNativeBtcValue($filterable);
             });
           }
 
