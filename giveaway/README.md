@@ -7,8 +7,9 @@
 * You're using [Poloniex Ninja](https://bit.ly/polo-ninja) and you like it (soft requirement)
 * You are a twitter user since at least June 2017
 * You're [my Twitter](https://twitter.com/codesonzh) follower (or have just become one)
-* All tweets (one tweet per twitter user) with below contents posted until and including 16th July 2017 23:59 GMT are eligible
+* All tweets (one tweet per twitter user) with below contents posted until and including 30th July 2017 23:59 GMT are eligible
 * Prize distribution and winner selection algorithm is described below
+* **You have to retweet the [annoncement](https://twitter.com/codesonzh/status/885617425823272960) of the giveaway so we gather enough candidates** - if you tweeted before 16th July, this is not a requirement
 * You have to post a tweet with contents of my [example tweet](https://twitter.com/codesonzh/status/885607860557709313) replaced with your BTC address:
 
 ```
@@ -40,7 +41,15 @@ All eligible tweets are to be collected day or two after the deadline.
 * All of the unique eligible addresses are then shuffled with python's random.shuffle
 * First 15 addresses are selected and the prize is sent out as described by the distribution
 
-I'll be using python 2.7.12 on a Windows 10 64-bit machine.
+I'll be using python 2.7.12 on a Windows 10 64-bit machine. I will most likely
+use the twitter search API with the following query to collect the addresses:
+
+```
+"I use Poloniex like a Ninja!" #PoloNinja #LevelOver9000 #btc @codesonzh
+```
+
+I will then filter out the results by checking that all of the parts are
+present and that all the rules have been followed.
 
 See [the code](https://github.com/codesonzh/poloniex-ninja/blob/master/giveaway/giveaway.py) for this algorithm. I'll be using the same script, except for
 filling in the last block hash and eligible addresses.
