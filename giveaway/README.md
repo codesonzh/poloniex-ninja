@@ -24,8 +24,8 @@ bit.ly/polo-ninja
 ## Prize distribution
 
 * 1 follower gets 0.005 BTC
-* 4 followers get 0.0025 BTC
-* 10 followers get 0.0005 BTC
+* 4 followers get 0.0025 BTC each
+* 10 followers get 0.0005 BTC each
 
 ## Winner selection
 
