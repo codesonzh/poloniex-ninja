@@ -53,3 +53,20 @@ present and that all the rules have been followed.
 
 See [the code](https://github.com/codesonzh/poloniex-ninja/blob/master/giveaway/giveaway.py) for this algorithm. I'll be using the same script, except for
 filling in the last block hash and eligible addresses.
+
+
+## Current eligible addresses
+
+Last update: 2nd August 2017
+
+If you're not on this list it's probably because I haven't updated, but you're
+welcome to create a pull request (it must link to your tweet), also, raise an
+issue if there's a typo or you think you should be here.
+
+* @TraderTravis 1HtGkVA4WdK4GgBq28UXL68zywxG65ZQ8E [tweet](https://twitter.com/trader_travis/status/885651289182322688)
+* @DuncanWierman 1B7CdmVo924P6VooceZzfaVSHbs22A7BWJ [tweet](https://twitter.com/DuncanWierman/status/885730942505041920)
+* @konradburnik 1MAye4Z1AxAfH1e2GVpTw99fpqgJcvkqJ6 [tweet](https://twitter.com/konradburnik/status/887060048207368192)
+* @soni_anirudh 1K4oo5xSMZ32EkrWP5Er2GnrvUR4hg9r9S [tweet](https://twitter.com/soni_anirudh/status/888814287963160576)
+* @RichAlexey 1PZKbnQEJRajPDMRAUnrtgTWpKvkf3wiXg [tweet](https://twitter.com/RichAlexey/status/889379906358054912)
+* @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176)
+* @Andy_vega 1EgWj9degJnpekDeJ1ZHX5t4BBmJwkKku [tweet](https://twitter.com/Andy_vega/status/892693150325760001)
