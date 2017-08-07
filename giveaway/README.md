@@ -2,6 +2,29 @@
 
 ## I'm giving away 0.02 BTC to 15 of my followers using Poloniex Ninja!
 
+## IMPORTANT UPDATE
+
+If you were affected by the Aug 1st BTC fork and wish to update your prize
+receiving address, do so by tweeting (include all tags, refs and links):
+
+```
+@codesonzh.UpdateMyAddr(<new-btc-address>);
+#PoloNinja #giveaway #bitcoin #bip148
+bit.ly/polo-ninja
+```
+
+Example (my donation address is used here):
+
+```
+@codesonzh.UpdateMyAddr(15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ);
+#PoloNinja #giveaway #bitcoin #bip148
+bit.ly/polo-ninja
+```
+
+You must be already eligible for the prize pool for this to take effect.
+You can only update your address once (until the prize is dealt or the giveaway
+is reset entirely).
+
 ## The rules
 
 * You're using [Poloniex Ninja](https://bit.ly/polo-ninja) and you like it (soft requirement)
@@ -70,3 +93,4 @@ issue if there's a typo or you think you should be here.
 * @RichAlexey 1PZKbnQEJRajPDMRAUnrtgTWpKvkf3wiXg [tweet](https://twitter.com/RichAlexey/status/889379906358054912)
 * @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176)
 * @Andy_vega 1EgWj9degJnpekDeJ1ZHX5t4BBmJwkKku [tweet](https://twitter.com/Andy_vega/status/892693150325760001)
+*
