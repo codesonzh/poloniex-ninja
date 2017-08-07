@@ -89,7 +89,7 @@ issue if there's a typo or you think you should be here.
 * @TraderTravis 1HtGkVA4WdK4GgBq28UXL68zywxG65ZQ8E [tweet](https://twitter.com/trader_travis/status/885651289182322688)
 * @DuncanWierman 1B7CdmVo924P6VooceZzfaVSHbs22A7BWJ [tweet](https://twitter.com/DuncanWierman/status/885730942505041920)
 * @konradburnik 1MAye4Z1AxAfH1e2GVpTw99fpqgJcvkqJ6 [tweet](https://twitter.com/konradburnik/status/887060048207368192)
-* @soni_anirudh 1K4oo5xSMZ32EkrWP5Er2GnrvUR4hg9r9S [tweet](https://twitter.com/soni_anirudh/status/888814287963160576)
+* @soni_anirudh 1AYx4HvjL1sDqfqtGfJoHHxmJThqAnR7FG [tweet](https://twitter.com/soni_anirudh/status/888814287963160576) [update](https://twitter.com/soni_anirudh/status/894394329732534273)
 * @RichAlexey 1PZKbnQEJRajPDMRAUnrtgTWpKvkf3wiXg [tweet](https://twitter.com/RichAlexey/status/889379906358054912)
 * @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176)
 * @Andy_vega 1EgWj9degJnpekDeJ1ZHX5t4BBmJwkKku [tweet](https://twitter.com/Andy_vega/status/892693150325760001)
