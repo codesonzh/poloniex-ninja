@@ -80,7 +80,7 @@ filling in the last block hash and eligible addresses.
 
 ## Current eligible addresses
 
-Last update: 2nd August 2017
+Last update: 12th August 2017
 
 If you're not on this list it's probably because I haven't updated, but you're
 welcome to create a pull request (it must link to your tweet), also, raise an
@@ -91,6 +91,10 @@ issue if there's a typo or you think you should be here.
 * @konradburnik 1MAye4Z1AxAfH1e2GVpTw99fpqgJcvkqJ6 [tweet](https://twitter.com/konradburnik/status/887060048207368192)
 * @soni_anirudh 1AYx4HvjL1sDqfqtGfJoHHxmJThqAnR7FG [tweet](https://twitter.com/soni_anirudh/status/888814287963160576) [update](https://twitter.com/soni_anirudh/status/894394329732534273)
 * @RichAlexey 1PZKbnQEJRajPDMRAUnrtgTWpKvkf3wiXg [tweet](https://twitter.com/RichAlexey/status/889379906358054912)
-* @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176)
 * @Andy_vega 1EgWj9degJnpekDeJ1ZHX5t4BBmJwkKku [tweet](https://twitter.com/Andy_vega/status/892693150325760001)
+* @MoujahidMedAmin 3DN8ca1q3gfmJ5AHDKTXqzRDEeUzvGDe4D [tweet](https://twitter.com/MoujahidMedAmin/status/896345901874262016)
 *
+
+## Addresses which are not eligible
+
+* @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176) - on Twitter since August 2017
