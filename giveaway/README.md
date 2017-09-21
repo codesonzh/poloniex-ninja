@@ -9,8 +9,11 @@
 * You're [my Twitter](https://twitter.com/codesonzh) follower (or have just become one)
 * All tweets (one tweet per twitter user) with below contents posted until and including 1st December 2017 23:59 GMT are eligible
 * Prize distribution and winner selection algorithm is described below
-* **You have to retweet the [annoncement](https://twitter.com/codesonzh/status/885617425823272960) of the giveaway so we gather enough candidates** - if you tweeted before 16th July, this is not a requirement
-* You have to post a tweet with contents of my [example tweet](https://twitter.com/codesonzh/status/885607860557709313) replaced with your BTC address:
+
+You need to post two tweets:
+
+* **retweet the [annoncement](https://twitter.com/codesonzh/status/885617425823272960) of the giveaway so we gather enough candidates** - if you tweeted before 16th July, this is not a requirement
+* post a tweet with contents of my [example tweet](https://twitter.com/codesonzh/status/885607860557709313) replaced with your BTC address:
 
 ```
 I use Poloniex like a Ninja!
