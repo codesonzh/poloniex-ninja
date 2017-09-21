@@ -2,35 +2,12 @@
 
 ## I'm giving away 0.02 BTC to 15 of my followers using Poloniex Ninja!
 
-## IMPORTANT UPDATE
-
-If you were affected by the Aug 1st BTC fork and wish to update your prize
-receiving address, do so by tweeting (include all tags, refs and links):
-
-```
-@codesonzh.UpdateMyAddr(<new-btc-address>);
-#PoloNinja #giveaway #bitcoin #bip148
-bit.ly/polo-ninja
-```
-
-Example (my donation address is used here):
-
-```
-@codesonzh.UpdateMyAddr(15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ);
-#PoloNinja #giveaway #bitcoin #bip148
-bit.ly/polo-ninja
-```
-
-You must be already eligible for the prize pool for this to take effect.
-You can only update your address once (until the prize is dealt or the giveaway
-is reset entirely).
-
 ## The rules
 
 * You're using [Poloniex Ninja](https://bit.ly/polo-ninja) and you like it (soft requirement)
-* You are a twitter user since at least July 2017
+* You are a twitter user since at least August 2017
 * You're [my Twitter](https://twitter.com/codesonzh) follower (or have just become one)
-* All tweets (one tweet per twitter user) with below contents posted until and including 1st September 2017 23:59 GMT are eligible
+* All tweets (one tweet per twitter user) with below contents posted until and including 1st December 2017 23:59 GMT are eligible
 * Prize distribution and winner selection algorithm is described below
 * **You have to retweet the [annoncement](https://twitter.com/codesonzh/status/885617425823272960) of the giveaway so we gather enough candidates** - if you tweeted before 16th July, this is not a requirement
 * You have to post a tweet with contents of my [example tweet](https://twitter.com/codesonzh/status/885607860557709313) replaced with your BTC address:
@@ -80,7 +57,7 @@ filling in the last block hash and eligible addresses.
 
 ## Current eligible addresses
 
-Last update: 12th August 2017
+Last update: 21st September 2017
 
 If you're not on this list it's probably because I haven't updated, but you're
 welcome to create a pull request (it must link to your tweet), also, raise an
@@ -93,8 +70,33 @@ issue if there's a typo or you think you should be here.
 * @RichAlexey 1PZKbnQEJRajPDMRAUnrtgTWpKvkf3wiXg [tweet](https://twitter.com/RichAlexey/status/889379906358054912)
 * @Andy_vega 1EgWj9degJnpekDeJ1ZHX5t4BBmJwkKku [tweet](https://twitter.com/Andy_vega/status/892693150325760001)
 * @MoujahidMedAmin 3DN8ca1q3gfmJ5AHDKTXqzRDEeUzvGDe4D [tweet](https://twitter.com/MoujahidMedAmin/status/896345901874262016)
-*
+* @X0X0X0 13Grz3Z1AsKffsVgZnTFMYjEeMyHZpASfm [tweet](https://twitter.com/X0X0X0/status/907711603705044993)
 
 ## Addresses which are not eligible
 
-* @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176) - on Twitter since August 2017
+* @Nahiynus 1EhqmabsGUc5dUDqvroiSPvJRnfaDLjCks [tweet](https://twitter.com/Nahiynus/status/892229764014002176) - on Twitter since August 2017 while the cap join date was July.
+
+----
+
+## The BTC Cash Fork
+
+If you were affected by the Aug 1st BTC fork and wish to update your prize
+receiving address, do so by tweeting (include all tags, refs and links):
+
+```
+@codesonzh.UpdateMyAddr(<new-btc-address>);
+#PoloNinja #giveaway #bitcoin #bip148
+bit.ly/polo-ninja
+```
+
+Example (my donation address is used here):
+
+```
+@codesonzh.UpdateMyAddr(15gdw8khnhEvVEEjbSR8aXSPvbwNdCUEPJ);
+#PoloNinja #giveaway #bitcoin #bip148
+bit.ly/polo-ninja
+```
+
+You must be already eligible for the prize pool for this to take effect.
+You can only update your address once (until the prize is dealt or the giveaway
+is reset entirely).
