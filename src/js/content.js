@@ -1216,17 +1216,21 @@
 
       
     
- 
-var getTickerData = setInterval(function(){loadTickerData(function (data) {
-    //console.log(data);
-    var tichers = [];
-    console.log('ajax res');
-    if (currentCoin) {
-        onTicker([currentCoin, data[currentCoin].last]);
+ var getTickerData = setInterval(function(){
+    if(!$('body').hasClass('loggedOut')){
+        loadTickerData(function (data) {
+            //console.log(data);
+            var tichers = [];
+            console.log('ajax res');
+            if (currentCoin) {
+                onTicker([currentCoin, data[currentCoin].last]);
+            }
+        
+            onTicker(['USDT_BTC', data['USDT_BTC'].last]);
+        });
     }
-
-    onTicker(['USDT_BTC', data['USDT_BTC'].last]);
-})},1000);
+    
+},1000);
 
 main();
 
