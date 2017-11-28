@@ -25,7 +25,7 @@ var config = {
   // Period for checking the progress bar status.
   'PROGRESS_CHECK_PERIOD_MS': 50,
   // Maximum period for updating the ticker.
-  'RENDER_PRICE_UPDATE_PERIOD_MS': 500
+  'RENDER_PRICE_UPDATE_PERIOD_MS': 10000
 }
 
 // The current state.

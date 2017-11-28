@@ -20,7 +20,7 @@
     ]
   }, 
   "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.43", 
+  "version": "0.0.44", 
   "manifest_version": 2, 
   "content_scripts": [
     {
