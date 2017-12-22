@@ -5,14 +5,14 @@
 ## The rules
 
 * You're using [Poloniex Ninja](https://bit.ly/polo-ninja) and you like it (soft requirement)
-* You are a twitter user since at least August 2017
+* You are a twitter user since at least November 2017
 * You're [my Twitter](https://twitter.com/codesonzh) follower (or have just become one)
-* All tweets (one tweet per twitter user) with below contents posted until and including 1st December 2017 23:59 GMT are eligible
+* All tweets (one tweet per twitter user) with below contents posted until and including 1st March 2018 23:59 GMT are eligible
 * Prize distribution and winner selection algorithm is described below
 
 You need to post two tweets:
 
-* **retweet the [annoncement](https://twitter.com/codesonzh/status/885617425823272960) of the giveaway so we gather enough candidates** - if you tweeted before 16th July, this is not a requirement
+* **retweet the [annoncement](https://twitter.com/codesonzh/status/885617425823272960) of the giveaway so we gather enough candidates** - if you tweeted before July 16th 2017, this is not a requirement
 * post a tweet with contents of my [example tweet](https://twitter.com/codesonzh/status/885607860557709313) replaced with your BTC address:
 
 ```
@@ -60,7 +60,7 @@ filling in the last block hash and eligible addresses.
 
 ## Current eligible addresses
 
-Last update: 21st September 2017
+Last update: 22nd December 2017
 
 If you're not on this list it's probably because I haven't updated, but you're
 welcome to create a pull request (it must link to your tweet), also, raise an
@@ -74,6 +74,8 @@ issue if there's a typo or you think you should be here.
 * @Andy_vega 1EgWj9degJnpekDeJ1ZHX5t4BBmJwkKku [tweet](https://twitter.com/Andy_vega/status/892693150325760001)
 * @MoujahidMedAmin 3DN8ca1q3gfmJ5AHDKTXqzRDEeUzvGDe4D [tweet](https://twitter.com/MoujahidMedAmin/status/896345901874262016)
 * @X0X0X0 13Grz3Z1AsKffsVgZnTFMYjEeMyHZpASfm [tweet](https://twitter.com/X0X0X0/status/907711603705044993)
+* @MUsalehofficial 1PAFHixYHfxpRvvijw6TVjUYpMEXV5UH21 [tweet](https://twitter.com/MUsalehofficial/status/928439137014878208)
+
 
 ## Addresses which are not eligible
 
