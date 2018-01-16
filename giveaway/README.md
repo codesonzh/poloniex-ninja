@@ -75,6 +75,7 @@ issue if there's a typo or you think you should be here.
 * @MoujahidMedAmin 3DN8ca1q3gfmJ5AHDKTXqzRDEeUzvGDe4D [tweet](https://twitter.com/MoujahidMedAmin/status/896345901874262016)
 * @X0X0X0 13Grz3Z1AsKffsVgZnTFMYjEeMyHZpASfm [tweet](https://twitter.com/X0X0X0/status/907711603705044993)
 * @MUsalehofficial 1PAFHixYHfxpRvvijw6TVjUYpMEXV5UH21 [tweet](https://twitter.com/MUsalehofficial/status/928439137014878208)
+* @Tr3nktas 1KRa6bFvUs9561c8FMjU5XWN22WvzPcErS [tweet](https://twitter.com/Tr3nktas/status/952284548909404160)
 
 
 ## Addresses which are not eligible
