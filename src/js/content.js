@@ -178,6 +178,13 @@ function applySettings(settings) {
   setTickerEnabled(settings.real_time_updates.ticker);
   setNativeBtcValueUpdateEnabled(settings.real_time_updates.btc_value);
   applyFilterContext();
+  applyPromoSettings(settings.promo);
+}
+
+function applyPromoSettings(promoSettings) {
+  $(".poloniex-ninja.promo-div").toggleClass(
+      'poloniex-ninja-hidden',
+      !promoSettings.visible);
 }
 
 // Apply DOM changes to directives.
@@ -1127,10 +1134,21 @@ function initializeTicker(tickerData) {
 function main() {
   // Match the page and apply a DOM layer.
   if (getPagePath().match(/balances.*/)) {
-    loadSettings(function(settings) {
-      loadCachedState(function() {
-        setupExtraBalanceTableColumns(settings);
-        setupExtraFilteringOptions(settings);
+    var promo = new Promo();
+    promo.fetchPromoDiv().then(function($div) {
+      $div.insertBefore("#balances");
+      $div.find("#promo-dismiss-link").click(function(){
+        updateSettings(function(settings) {
+          settings.promo.visible = false;
+        });
+      });
+      digestDomDirectives($div);
+    }).then(function() {
+      loadSettings(function(settings) {
+        loadCachedState(function() {
+          setupExtraBalanceTableColumns(settings);
+          setupExtraFilteringOptions(settings);
+        });
       });
     });
 

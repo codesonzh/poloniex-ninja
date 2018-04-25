@@ -1,6 +1,10 @@
 {
   "web_accessible_resources": [
-    "img/icon32x32.png"
+    "img/icon32x32.png", 
+    "img/icon48x48.png", 
+    "img/icon64x64.png", 
+    "img/binance-ninja-icon48x48.png", 
+    "html/promo.html"
   ], 
   "description": "Improved overview of crypto balance on Poloniex\u2122: buy price, growth rate and USD value of your bitcoin, ethereum and altcoins.", 
   "short_name": "poloninja", 
@@ -20,7 +24,7 @@
     ]
   }, 
   "homepage_url": "https://github.com/codesonzh/poloniex-ninja", 
-  "version": "0.0.44", 
+  "version": "0.0.45", 
   "manifest_version": 2, 
   "content_scripts": [
     {
@@ -38,6 +42,7 @@
         "js/consts.js", 
         "js/settings.js", 
         "js/websocket.js", 
+        "js/promo.js", 
         "js/content.js"
       ]
     }

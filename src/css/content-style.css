@@ -143,3 +143,42 @@ input.poloniex-ninja-donation-amount {
 .poloniex-ninja-filtered-untraded .poloniex-ninja-untraded {
   display: none;
 }
+
+.poloniex-ninja.promo-div {
+  text-align: center;
+}
+
+.poloniex-ninja.promo-div-container {
+  padding-bottom: 5px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  background: #f2faff;
+  border: 1px solid #8cbcbd;
+  width: auto;
+  display: inline-block;
+}
+
+.poloniex-ninja.promo-div h2 {
+  margin-top: 0px !important;
+}
+
+.poloniex-ninja-cols {
+  display: inline-block;
+}
+
+.poloniex-ninja-cols > div {
+  padding-top: 10px;
+  display: inline-block;
+  vertical-align: top;
+  line-height: 1.5em;
+  padding-left: 10px;
+}
+
+.binance-ninja-link {
+  display: block;
+  padding: 10px;
+}
+
+.binance-ninja-link:hover {
+  background: #fff;
+}

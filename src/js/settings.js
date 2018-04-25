@@ -84,6 +84,9 @@ var DEFAULT_SETTINGS = {
   'real_time_updates': {
     'ticker': true,
     'btc_value': true
+  },
+  'promo': {
+    'visible': true
   }
 };
 
@@ -111,6 +114,10 @@ var CONTEXT_MENU = [
       'key': 'real_time_btc_value',
       'title': 'BTC value (experimental)',
       'path': 'real_time_updates.btc_value'}]},
+  {'type': 'checkbox',
+   'key': 'promo_visible',
+   'path': 'promo.visible',
+   'title': 'Show update info'},
   {'type': 'separator'},
   {'type': 'normal',
    'key': 'donate',
