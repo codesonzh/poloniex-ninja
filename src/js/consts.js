@@ -64,6 +64,38 @@ MARKETS_BY_ID = {
     "quote": "BCN",
     "currencyPair": "BTC_BCN"
   },
+  "8": {
+    "id": 8,
+    "baseID": 28,
+    "quoteID": 20,
+    "base": "BTC",
+    "quote": "BELA",
+    "currencyPair": "BTC_BELA"
+  },
+  "10": {
+    "id": 10,
+    "baseID": 28,
+    "quoteID": 22,
+    "base": "BTC",
+    "quote": "BLK",
+    "currencyPair": "BTC_BLK"
+  },
+  "12": {
+    "id": 12,
+    "baseID": 28,
+    "quoteID": 29,
+    "base": "BTC",
+    "quote": "BTCD",
+    "currencyPair": "BTC_BTCD"
+  },
+  "13": {
+    "id": 13,
+    "baseID": 28,
+    "quoteID": 31,
+    "base": "BTC",
+    "quote": "BTM",
+    "currencyPair": "BTC_BTM"
+  },
   "14": {
     "id": 14,
     "baseID": 28,
@@ -112,6 +144,30 @@ MARKETS_BY_ID = {
     "quote": "DOGE",
     "currencyPair": "BTC_DOGE"
   },
+  "28": {
+    "id": 28,
+    "baseID": 28,
+    "quoteID": 69,
+    "base": "BTC",
+    "quote": "EMC2",
+    "currencyPair": "BTC_EMC2"
+  },
+  "31": {
+    "id": 31,
+    "baseID": 28,
+    "quoteID": 78,
+    "base": "BTC",
+    "quote": "FLDC",
+    "currencyPair": "BTC_FLDC"
+  },
+  "32": {
+    "id": 32,
+    "baseID": 28,
+    "quoteID": 254,
+    "base": "BTC",
+    "quote": "FLO",
+    "currencyPair": "BTC_FLO"
+  },
   "38": {
     "id": 38,
     "baseID": 28,
@@ -119,6 +175,14 @@ MARKETS_BY_ID = {
     "base": "BTC",
     "quote": "GAME",
     "currencyPair": "BTC_GAME"
+  },
+  "40": {
+    "id": 40,
+    "baseID": 28,
+    "quoteID": 261,
+    "base": "BTC",
+    "quote": "GRC",
+    "currencyPair": "BTC_GRC"
   },
   "43": {
     "id": 43,
@@ -160,6 +224,14 @@ MARKETS_BY_ID = {
     "quote": "NAV",
     "currencyPair": "BTC_NAV"
   },
+  "63": {
+    "id": 63,
+    "baseID": 28,
+    "quoteID": 153,
+    "base": "BTC",
+    "quote": "NEOS",
+    "currencyPair": "BTC_NEOS"
+  },
   "64": {
     "id": 64,
     "baseID": 28,
@@ -176,6 +248,22 @@ MARKETS_BY_ID = {
     "quote": "NXT",
     "currencyPair": "BTC_NXT"
   },
+  "73": {
+    "id": 73,
+    "baseID": 28,
+    "quoteID": 168,
+    "base": "BTC",
+    "quote": "PINK",
+    "currencyPair": "BTC_PINK"
+  },
+  "74": {
+    "id": 74,
+    "baseID": 28,
+    "quoteID": 171,
+    "base": "BTC",
+    "quote": "POT",
+    "currencyPair": "BTC_POT"
+  },
   "75": {
     "id": 75,
     "baseID": 28,
@@ -183,6 +271,14 @@ MARKETS_BY_ID = {
     "base": "BTC",
     "quote": "PPC",
     "currencyPair": "BTC_PPC"
+  },
+  "83": {
+    "id": 83,
+    "baseID": 28,
+    "quoteID": 183,
+    "base": "BTC",
+    "quote": "RIC",
+    "currencyPair": "BTC_RIC"
   },
   "89": {
     "id": 89,
@@ -208,6 +304,22 @@ MARKETS_BY_ID = {
     "quote": "VIA",
     "currencyPair": "BTC_VIA"
   },
+  "98": {
+    "id": 98,
+    "baseID": 28,
+    "quoteID": 253,
+    "base": "BTC",
+    "quote": "XVC",
+    "currencyPair": "BTC_XVC"
+  },
+  "99": {
+    "id": 99,
+    "baseID": 28,
+    "quoteID": 220,
+    "base": "BTC",
+    "quote": "VRC",
+    "currencyPair": "BTC_VRC"
+  },
   "100": {
     "id": 100,
     "baseID": 28,
@@ -215,6 +327,14 @@ MARKETS_BY_ID = {
     "base": "BTC",
     "quote": "VTC",
     "currencyPair": "BTC_VTC"
+  },
+  "104": {
+    "id": 104,
+    "baseID": 28,
+    "quoteID": 229,
+    "base": "BTC",
+    "quote": "XBC",
+    "currencyPair": "BTC_XBC"
   },
   "108": {
     "id": 108,
@@ -320,6 +440,22 @@ MARKETS_BY_ID = {
     "quote": "BCN",
     "currencyPair": "XMR_BCN"
   },
+  "130": {
+    "id": 130,
+    "baseID": 240,
+    "quoteID": 22,
+    "base": "XMR",
+    "quote": "BLK",
+    "currencyPair": "XMR_BLK"
+  },
+  "131": {
+    "id": 131,
+    "baseID": 240,
+    "quoteID": 29,
+    "base": "XMR",
+    "quote": "BTCD",
+    "currencyPair": "XMR_BTCD"
+  },
   "132": {
     "id": 132,
     "baseID": 240,
@@ -376,6 +512,22 @@ MARKETS_BY_ID = {
     "quote": "SC",
     "currencyPair": "BTC_SC"
   },
+  "151": {
+    "id": 151,
+    "baseID": 28,
+    "quoteID": 269,
+    "base": "BTC",
+    "quote": "BCY",
+    "currencyPair": "BTC_BCY"
+  },
+  "153": {
+    "id": 153,
+    "baseID": 28,
+    "quoteID": 270,
+    "base": "BTC",
+    "quote": "EXP",
+    "currencyPair": "BTC_EXP"
+  },
   "155": {
     "id": 155,
     "baseID": 28,
@@ -383,6 +535,22 @@ MARKETS_BY_ID = {
     "base": "BTC",
     "quote": "FCT",
     "currencyPair": "BTC_FCT"
+  },
+  "158": {
+    "id": 158,
+    "baseID": 28,
+    "quoteID": 274,
+    "base": "BTC",
+    "quote": "RADS",
+    "currencyPair": "BTC_RADS"
+  },
+  "160": {
+    "id": 160,
+    "baseID": 28,
+    "quoteID": 275,
+    "base": "BTC",
+    "quote": "AMP",
+    "currencyPair": "BTC_AMP"
   },
   "162": {
     "id": 162,
@@ -536,6 +704,14 @@ MARKETS_BY_ID = {
     "quote": "STRAT",
     "currencyPair": "BTC_STRAT"
   },
+  "183": {
+    "id": 183,
+    "baseID": 28,
+    "quoteID": 288,
+    "base": "BTC",
+    "quote": "NXC",
+    "currencyPair": "BTC_NXC"
+  },
   "184": {
     "id": 184,
     "baseID": 28,
@@ -559,6 +735,22 @@ MARKETS_BY_ID = {
     "base": "ETH",
     "quote": "GNT",
     "currencyPair": "ETH_GNT"
+  },
+  "187": {
+    "id": 187,
+    "baseID": 28,
+    "quoteID": 291,
+    "base": "BTC",
+    "quote": "GNO",
+    "currencyPair": "BTC_GNO"
+  },
+  "188": {
+    "id": 188,
+    "baseID": 267,
+    "quoteID": 291,
+    "base": "ETH",
+    "quote": "GNO",
+    "currencyPair": "ETH_GNO"
   },
   "189": {
     "id": 189,
@@ -655,405 +847,5 @@ MARKETS_BY_ID = {
     "base": "BTC",
     "quote": "STORJ",
     "currencyPair": "BTC_STORJ"
-  },
-  "201": {
-    "id": 201,
-    "baseID": 28,
-    "quoteID": 298,
-    "base": "BTC",
-    "quote": "EOS",
-    "currencyPair": "BTC_EOS"
-  },
-  "202": {
-    "id": 202,
-    "baseID": 267,
-    "quoteID": 298,
-    "base": "ETH",
-    "quote": "EOS",
-    "currencyPair": "ETH_EOS"
-  },
-  "203": {
-    "id": 203,
-    "baseID": 214,
-    "quoteID": 298,
-    "base": "USDT",
-    "quote": "EOS",
-    "currencyPair": "USDT_EOS"
-  },
-  "204": {
-    "id": 204,
-    "baseID": 28,
-    "quoteID": 300,
-    "base": "BTC",
-    "quote": "SNT",
-    "currencyPair": "BTC_SNT"
-  },
-  "205": {
-    "id": 205,
-    "baseID": 267,
-    "quoteID": 300,
-    "base": "ETH",
-    "quote": "SNT",
-    "currencyPair": "ETH_SNT"
-  },
-  "206": {
-    "id": 206,
-    "baseID": 214,
-    "quoteID": 300,
-    "base": "USDT",
-    "quote": "SNT",
-    "currencyPair": "USDT_SNT"
-  },
-  "207": {
-    "id": 207,
-    "baseID": 28,
-    "quoteID": 301,
-    "base": "BTC",
-    "quote": "KNC",
-    "currencyPair": "BTC_KNC"
-  },
-  "208": {
-    "id": 208,
-    "baseID": 267,
-    "quoteID": 301,
-    "base": "ETH",
-    "quote": "KNC",
-    "currencyPair": "ETH_KNC"
-  },
-  "209": {
-    "id": 209,
-    "baseID": 214,
-    "quoteID": 301,
-    "base": "USDT",
-    "quote": "KNC",
-    "currencyPair": "USDT_KNC"
-  },
-  "210": {
-    "id": 210,
-    "baseID": 28,
-    "quoteID": 302,
-    "base": "BTC",
-    "quote": "BAT",
-    "currencyPair": "BTC_BAT"
-  },
-  "211": {
-    "id": 211,
-    "baseID": 267,
-    "quoteID": 302,
-    "base": "ETH",
-    "quote": "BAT",
-    "currencyPair": "ETH_BAT"
-  },
-  "212": {
-    "id": 212,
-    "baseID": 214,
-    "quoteID": 302,
-    "base": "USDT",
-    "quote": "BAT",
-    "currencyPair": "USDT_BAT"
-  },
-  "213": {
-    "id": 213,
-    "baseID": 28,
-    "quoteID": 303,
-    "base": "BTC",
-    "quote": "LOOM",
-    "currencyPair": "BTC_LOOM"
-  },
-  "214": {
-    "id": 214,
-    "baseID": 267,
-    "quoteID": 303,
-    "base": "ETH",
-    "quote": "LOOM",
-    "currencyPair": "ETH_LOOM"
-  },
-  "215": {
-    "id": 215,
-    "baseID": 214,
-    "quoteID": 303,
-    "base": "USDT",
-    "quote": "LOOM",
-    "currencyPair": "USDT_LOOM"
-  },
-  "216": {
-    "id": 216,
-    "baseID": 214,
-    "quoteID": 59,
-    "base": "USDT",
-    "quote": "DOGE",
-    "currencyPair": "USDT_DOGE"
-  },
-  "217": {
-    "id": 217,
-    "baseID": 214,
-    "quoteID": 290,
-    "base": "USDT",
-    "quote": "GNT",
-    "currencyPair": "USDT_GNT"
-  },
-  "218": {
-    "id": 218,
-    "baseID": 214,
-    "quoteID": 278,
-    "base": "USDT",
-    "quote": "LSK",
-    "currencyPair": "USDT_LSK"
-  },
-  "219": {
-    "id": 219,
-    "baseID": 214,
-    "quoteID": 268,
-    "base": "USDT",
-    "quote": "SC",
-    "currencyPair": "USDT_SC"
-  },
-  "220": {
-    "id": 220,
-    "baseID": 214,
-    "quoteID": 293,
-    "base": "USDT",
-    "quote": "ZRX",
-    "currencyPair": "USDT_ZRX"
-  },
-  "221": {
-    "id": 221,
-    "baseID": 28,
-    "quoteID": 304,
-    "base": "BTC",
-    "quote": "QTUM",
-    "currencyPair": "BTC_QTUM"
-  },
-  "222": {
-    "id": 222,
-    "baseID": 267,
-    "quoteID": 304,
-    "base": "ETH",
-    "quote": "QTUM",
-    "currencyPair": "ETH_QTUM"
-  },
-  "223": {
-    "id": 223,
-    "baseID": 214,
-    "quoteID": 304,
-    "base": "USDT",
-    "quote": "QTUM",
-    "currencyPair": "USDT_QTUM"
-  },
-  "224": {
-    "id": 224,
-    "baseID": 299,
-    "quoteID": 28,
-    "base": "USDC",
-    "quote": "BTC",
-    "currencyPair": "USDC_BTC"
-  },
-  "225": {
-    "id": 225,
-    "baseID": 299,
-    "quoteID": 267,
-    "base": "USDC",
-    "quote": "ETH",
-    "currencyPair": "USDC_ETH"
-  },
-  "226": {
-    "id": 226,
-    "baseID": 299,
-    "quoteID": 214,
-    "base": "USDC",
-    "quote": "USDT",
-    "currencyPair": "USDC_USDT"
-  },
-  "229": {
-    "id": 229,
-    "baseID": 28,
-    "quoteID": 306,
-    "base": "BTC",
-    "quote": "MANA",
-    "currencyPair": "BTC_MANA"
-  },
-  "230": {
-    "id": 230,
-    "baseID": 267,
-    "quoteID": 306,
-    "base": "ETH",
-    "quote": "MANA",
-    "currencyPair": "ETH_MANA"
-  },
-  "231": {
-    "id": 231,
-    "baseID": 214,
-    "quoteID": 306,
-    "base": "USDT",
-    "quote": "MANA",
-    "currencyPair": "USDT_MANA"
-  },
-  "232": {
-    "id": 232,
-    "baseID": 28,
-    "quoteID": 305,
-    "base": "BTC",
-    "quote": "BNT",
-    "currencyPair": "BTC_BNT"
-  },
-  "233": {
-    "id": 233,
-    "baseID": 267,
-    "quoteID": 305,
-    "base": "ETH",
-    "quote": "BNT",
-    "currencyPair": "ETH_BNT"
-  },
-  "234": {
-    "id": 234,
-    "baseID": 214,
-    "quoteID": 305,
-    "base": "USDT",
-    "quote": "BNT",
-    "currencyPair": "USDT_BNT"
-  },
-  "235": {
-    "id": 235,
-    "baseID": 299,
-    "quoteID": 292,
-    "base": "USDC",
-    "quote": "BCH",
-    "currencyPair": "USDC_BCH"
-  },
-  "236": {
-    "id": 236,
-    "baseID": 28,
-    "quoteID": 308,
-    "base": "BTC",
-    "quote": "BCHABC",
-    "currencyPair": "BTC_BCHABC"
-  },
-  "237": {
-    "id": 237,
-    "baseID": 299,
-    "quoteID": 308,
-    "base": "USDC",
-    "quote": "BCHABC",
-    "currencyPair": "USDC_BCHABC"
-  },
-  "238": {
-    "id": 238,
-    "baseID": 28,
-    "quoteID": 309,
-    "base": "BTC",
-    "quote": "BCHSV",
-    "currencyPair": "BTC_BCHSV"
-  },
-  "239": {
-    "id": 239,
-    "baseID": 299,
-    "quoteID": 309,
-    "base": "USDC",
-    "quote": "BCHSV",
-    "currencyPair": "USDC_BCHSV"
-  },
-  "240": {
-    "id": 240,
-    "baseID": 299,
-    "quoteID": 243,
-    "base": "USDC",
-    "quote": "XRP",
-    "currencyPair": "USDC_XRP"
-  },
-  "241": {
-    "id": 241,
-    "baseID": 299,
-    "quoteID": 240,
-    "base": "USDC",
-    "quote": "XMR",
-    "currencyPair": "USDC_XMR"
-  },
-  "242": {
-    "id": 242,
-    "baseID": 299,
-    "quoteID": 198,
-    "base": "USDC",
-    "quote": "STR",
-    "currencyPair": "USDC_STR"
-  },
-  "243": {
-    "id": 243,
-    "baseID": 299,
-    "quoteID": 59,
-    "base": "USDC",
-    "quote": "DOGE",
-    "currencyPair": "USDC_DOGE"
-  },
-  "244": {
-    "id": 244,
-    "baseID": 299,
-    "quoteID": 125,
-    "base": "USDC",
-    "quote": "LTC",
-    "currencyPair": "USDC_LTC"
-  },
-  "245": {
-    "id": 245,
-    "baseID": 299,
-    "quoteID": 286,
-    "base": "USDC",
-    "quote": "ZEC",
-    "currencyPair": "USDC_ZEC"
-  },
-  "246": {
-    "id": 246,
-    "baseID": 28,
-    "quoteID": 307,
-    "base": "BTC",
-    "quote": "FOAM",
-    "currencyPair": "BTC_FOAM"
-  },
-  "247": {
-    "id": 247,
-    "baseID": 299,
-    "quoteID": 307,
-    "base": "USDC",
-    "quote": "FOAM",
-    "currencyPair": "USDC_FOAM"
-  },
-  "248": {
-    "id": 248,
-    "baseID": 28,
-    "quoteID": 310,
-    "base": "BTC",
-    "quote": "NMR",
-    "currencyPair": "BTC_NMR"
-  },
-  "249": {
-    "id": 249,
-    "baseID": 28,
-    "quoteID": 311,
-    "base": "BTC",
-    "quote": "POLY",
-    "currencyPair": "BTC_POLY"
-  },
-  "250": {
-    "id": 250,
-    "baseID": 28,
-    "quoteID": 312,
-    "base": "BTC",
-    "quote": "LPT",
-    "currencyPair": "BTC_LPT"
-  },
-  "251": {
-    "id": 251,
-    "baseID": 28,
-    "quoteID": 314,
-    "base": "BTC",
-    "quote": "GRIN",
-    "currencyPair": "BTC_GRIN"
-  },
-  "252": {
-    "id": 252,
-    "baseID": 299,
-    "quoteID": 314,
-    "base": "USDC",
-    "quote": "GRIN",
-    "currencyPair": "USDC_GRIN"
   }
 }

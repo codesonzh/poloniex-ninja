@@ -178,7 +178,7 @@ function applySettings(settings) {
   setTickerEnabled(settings.real_time_updates.ticker);
   setNativeBtcValueUpdateEnabled(settings.real_time_updates.btc_value);
   applyFilterContext();
-  applyPromoSettings(settings.promo201903);
+  applyPromoSettings(settings.promo);
 }
 
 function applyPromoSettings(promoSettings) {
@@ -414,7 +414,7 @@ function attachDonationInfo($actionRow) {
   $donationRow =
       $("<div class='formRow poloniex-ninja-donation'>" +
         "<img width='24' class='icon' data-ext-src='img/icon32x32.png'> " +
-        "Want to support PoloNinja? " +
+        "Find PoloNinja useful? " +
         "<a href='javascript:' id='poloniex-ninja-fill-in-button' " +
            "class='matchLink'>" +
         "<abbr title='By clicking this, it will only fill in the address " +
@@ -1139,7 +1139,7 @@ function main() {
       $div.insertBefore("#balances");
       $div.find("#promo-dismiss-link").click(function(){
         updateSettings(function(settings) {
-          settings.promo201903.visible = false;
+          settings.promo.visible = false;
         });
       });
       digestDomDirectives($div);

@@ -85,7 +85,7 @@ var DEFAULT_SETTINGS = {
     'ticker': true,
     'btc_value': true
   },
-  'promo201903': {
+  'promo': {
     'visible': true
   }
 };
@@ -115,8 +115,8 @@ var CONTEXT_MENU = [
       'title': 'BTC value (experimental)',
       'path': 'real_time_updates.btc_value'}]},
   {'type': 'checkbox',
-   'key': 'promo201903_visible',
-   'path': 'promo201903.visible',
+   'key': 'promo_visible',
+   'path': 'promo.visible',
    'title': 'Show update info'},
   {'type': 'separator'},
   {'type': 'normal',
